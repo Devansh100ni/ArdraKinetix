@@ -1,0 +1,114 @@
+@model DeveloperDashboardDto
+
+<!-- Developer Dashboard Header -->
+<div class="flex items-center justify-between">
+    <div>
+        <h2 class="text-2xl font-black text-slate-900 tracking-tight">Developer Workspace</h2>
+        <p class="text-xs text-slate-500 mt-0.5 font-medium">Tasks and sprint activities across your assigned client tenants.</p>
+    </div>
+
+    <div class="flex items-center gap-3">
+        <a href="/Scrum" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+            Open Scrum Board &rarr;
+        </a>
+    </div>
+</div>
+
+<!-- Key Stat Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Assigned Tenants</div>
+        <div class="text-3xl font-black text-slate-900">@Model.AssignedTenantsCount</div>
+        <div class="flex flex-wrap gap-1.5 mt-2.5">
+            @foreach (var t in Model.AssignedTenants)
+            {
+                <span class="px-2 py-0.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 font-mono text-[10px] font-bold">
+                    @t.Code
+                </span>
+            }
+        </div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">My Assigned Tasks</div>
+        <div class="text-3xl font-black text-slate-900">@Model.MyAssignedTasksCount</div>
+        <div class="text-[11px] text-indigo-600 mt-2 font-semibold">Assigned directly to you</div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">High / Critical Tasks</div>
+        <div class="text-3xl font-black text-amber-600">@Model.HighPriorityTasksCount</div>
+        <div class="text-[11px] text-slate-500 mt-2 font-medium">Urgent sprint priorities</div>
+    </div>
+
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Overdue Tasks</div>
+        <div class="text-3xl font-black text-rose-600">@Model.OverdueTasksCount</div>
+        <div class="text-[11px] text-rose-600/90 mt-2 font-medium">Require immediate delivery</div>
+    </div>
+</div>
+
+<!-- My Assigned Tasks List -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+        <div>
+            <h3 class="text-base font-bold text-slate-900">My Active Tasks</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Tasks assigned to your user account across all authorized tenants.</p>
+        </div>
+        <a href="/Tasks" class="text-xs font-bold text-indigo-600 hover:text-indigo-700">View All Tasks &rarr;</a>
+    </div>
+
+    @if (Model.MyTasks.Count == 0)
+    {
+        <div class="p-8">
+            <partial name="_EmptyState" model="@("You have no tasks assigned currently.")" />
+        </div>
+    }
+    else
+    {
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-700">
+                <thead class="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
+                    <tr>
+                        <th class="py-3.5 px-6">Task</th>
+                        <th class="py-3.5 px-6">Tenant</th>
+                        <th class="py-3.5 px-6">Status</th>
+                        <th class="py-3.5 px-6">Priority</th>
+                        <th class="py-3.5 px-6">Estimate</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach (var task in Model.MyTasks)
+                    {
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="py-3.5 px-6 font-medium">
+                                <a href="/Tasks/Details/@task.Id" class="font-mono font-bold text-indigo-600 hover:underline mr-2">@task.TaskNumber</a>
+                                <span class="text-slate-800 font-medium">@task.Title</span>
+                            </td>
+                            <td class="py-3.5 px-6">
+                                <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[11px] font-mono text-slate-700 font-bold">
+                                    @task.TenantCode
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-6">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+                                      style="background-color: @(task.StatusColor)15; color: @task.StatusColor; border-color: @(task.StatusColor)40;">
+                                    @task.StatusName
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-6">
+                                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+                                      style="background-color: @(task.PriorityColor)15; color: @task.PriorityColor; border-color: @(task.PriorityColor)40;">
+                                    @task.PriorityName
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-6 text-slate-500 font-medium">
+                                @(task.EstimatedHours.HasValue ? $"{task.EstimatedHours.Value} hrs" : "-")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,179 @@
+@model TaskListViewModel
+@inject TaskBoard.Application.Security.ITenantContext TenantCtx
+@inject TaskBoard.Application.Security.ICurrentUserService CurrentUser
+@{
+    ViewData["Title"] = "Tasks";
+}
+
+<div class="space-y-6 max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+            <h2 class="text-2xl font-black text-slate-900 tracking-tight">Task Management</h2>
+            <p class="text-xs text-slate-500 mt-0.5 font-medium">Filter, search, and manage tasks across your tenant scope.</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <a href="/Scrum" class="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 shadow-2xs transition">
+                Scrum Board View &rarr;
+            </a>
+            <a href="/Tasks/Create" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+                + Create Task
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Bar Card -->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <form method="get" asp-action="Index" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <!-- Search -->
+            <div class="lg:col-span-2">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Search</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </span>
+                    <input type="text" name="Search" value="@Model.Criteria.Search" placeholder="Task number, title, description..." class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs" />
+                </div>
+            </div>
+
+            <!-- Tenant Filter (Admin / Dev) -->
+            @if (Model.AvailableTenants.Count > 0)
+            {
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Tenant</label>
+                    <select name="TenantId" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs">
+                        <option value="">All Authorized Tenants</option>
+                        @foreach (var t in Model.AvailableTenants)
+                        {
+                            <option value="@t.Id" selected="@(Model.Criteria.TenantId == t.Id)">@t.Name (@t.Code)</option>
+                        }
+                    </select>
+                </div>
+            }
+
+            <!-- Status Filter -->
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Status</label>
+                <select name="StatusId" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs">
+                    <option value="">All Statuses</option>
+                    @foreach (var s in Model.AvailableStatuses)
+                    {
+                        <option value="@s.Id" selected="@(Model.Criteria.StatusId == s.Id)">@s.Name</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Priority Filter -->
+            <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Priority</label>
+                <select name="PriorityId" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs">
+                    <option value="">All Priorities</option>
+                    @foreach (var p in Model.AvailablePriorities)
+                    {
+                        <option value="@p.Id" selected="@(Model.Criteria.PriorityId == p.Id)">@p.Name</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-end gap-2 lg:col-span-5 justify-end pt-2 border-t border-slate-100">
+                <a href="/Tasks" class="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 shadow-2xs transition">
+                    Reset
+                </a>
+                <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+                    Apply Filters
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tasks Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        @if (Model.Tasks.Items.Count == 0)
+        {
+            <div class="p-8">
+                <partial name="_EmptyState" model="@("No tasks match the selected filters.")" />
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-700">
+                    <thead class="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
+                        <tr>
+                            <th class="py-3.5 px-6">Task #</th>
+                            <th class="py-3.5 px-6">Title</th>
+                            <th class="py-3.5 px-6">Tenant</th>
+                            <th class="py-3.5 px-6">Status</th>
+                            <th class="py-3.5 px-6">Priority</th>
+                            <th class="py-3.5 px-6">Assignee</th>
+                            <th class="py-3.5 px-6">Estimate</th>
+                            <th class="py-3.5 px-6">Created On</th>
+                            <th class="py-3.5 px-6 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach (var task in Model.Tasks.Items)
+                        {
+                            <tr class="hover:bg-slate-50/80 transition group">
+                                <td class="py-3.5 px-6 font-mono font-bold text-indigo-600">
+                                    <a href="/Tasks/Details/@task.Id" class="hover:underline">@task.TaskNumber</a>
+                                </td>
+                                <td class="py-3.5 px-6 font-semibold text-slate-900">
+                                    <a href="/Tasks/Details/@task.Id" class="hover:text-indigo-600 transition">
+                                        @task.Title
+                                    </a>
+                                    @if (!string.IsNullOrEmpty(task.ParentTaskNumber))
+                                    {
+                                        <div class="text-[10px] text-slate-500 font-mono mt-0.5">
+                                            Parent: @task.ParentTaskNumber
+                                        </div>
+                                    }
+                                </td>
+                                <td class="py-3.5 px-6">
+                                    <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[11px] font-mono text-slate-700 font-bold">
+                                        @task.TenantCode
+                                    </span>
+                                </td>
+                                <td class="py-3.5 px-6">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+                                          style="background-color: @(task.StatusColor)15; color: @task.StatusColor; border-color: @(task.StatusColor)40;">
+                                        @task.StatusName
+                                    </span>
+                                </td>
+                                <td class="py-3.5 px-6">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border"
+                                          style="background-color: @(task.PriorityColor)15; color: @task.PriorityColor; border-color: @(task.PriorityColor)40;">
+                                        @task.PriorityName
+                                    </span>
+                                </td>
+                                <td class="py-3.5 px-6 font-medium text-slate-700">
+                                    @(task.AssignedUserName ?? "Unassigned")
+                                </td>
+                                <td class="py-3.5 px-6 text-slate-500 font-medium">
+                                    @(task.EstimatedHours.HasValue ? $"{task.EstimatedHours.Value} hrs" : "-")
+                                </td>
+                                <td class="py-3.5 px-6 text-slate-500 font-medium">
+                                    @task.CreatedOn.ToString("MMM dd, yyyy")
+                                </td>
+                                <td class="py-3.5 px-6 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a href="/Tasks/Details/@task.Id" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition" title="View Details">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        </a>
+                                        <a href="/Tasks/Edit/@task.Id" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition" title="Edit">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <partial name="_Pagination" model="Model.Tasks" />
+        }
+    </div>
+</div>

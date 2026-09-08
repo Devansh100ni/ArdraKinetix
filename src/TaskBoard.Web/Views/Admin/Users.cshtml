@@ -1,0 +1,129 @@
+@model AdminUsersViewModel
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="space-y-6 max-w-7xl mx-auto">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-black text-slate-900 tracking-tight">System Users & Roles</h2>
+            <p class="text-xs text-slate-500 mt-0.5 font-medium">Manage administrators, multi-tenant developers, and organization users.</p>
+        </div>
+
+        <a href="/Admin/UsersCreate" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+            + Create New User
+        </a>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+        <form method="get" class="flex items-center gap-3 flex-wrap">
+            <input type="text" name="Search" value="@Model.Filter.Search" placeholder="Search by name, email, or username..." class="w-72 py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs" />
+            
+            <select name="tenantId" class="py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-2xs">
+                <option value="">All Tenants</option>
+                @foreach (var t in Model.AvailableTenants)
+                {
+                    <option value="@t.Id" selected="@(Model.SelectedTenantId == t.Id)">@t.Name (@t.Code)</option>
+                }
+            </select>
+
+            <button type="submit" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition">Filter</button>
+            <a href="/Admin/Users" class="text-xs font-medium text-slate-500 hover:text-slate-900">Reset</a>
+        </form>
+    </div>
+
+    <!-- Users Table -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        @if (Model.Users.Items.Count == 0)
+        {
+            <div class="p-8">
+                <partial name="_EmptyState" model="@("No users found.")" />
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-700">
+                    <thead class="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200">
+                        <tr>
+                            <th class="py-3.5 px-6">User</th>
+                            <th class="py-3.5 px-6">Username</th>
+                            <th class="py-3.5 px-6">Role</th>
+                            <th class="py-3.5 px-6">Assigned Tenants</th>
+                            <th class="py-3.5 px-6">Status</th>
+                            <th class="py-3.5 px-6">Created On</th>
+                            <th class="py-3.5 px-6 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach (var user in Model.Users.Items)
+                        {
+                            <tr class="hover:bg-slate-50/80 transition">
+                                <td class="py-3.5 px-6">
+                                    <div class="font-bold text-slate-900">@user.FullName</div>
+                                    <div class="text-[10px] text-slate-500 font-medium">@user.Email</div>
+                                </td>
+                                <td class="py-3.5 px-6 font-mono font-semibold text-slate-700">@user.Username</td>
+                                <td class="py-3.5 px-6">
+                                    @foreach (var role in user.Roles)
+                                    {
+                                        var roleBadge = role == SystemRoles.Admin 
+                                            ? "bg-purple-50 text-purple-700 border-purple-200" 
+                                            : role == SystemRoles.Developer 
+                                                ? "bg-emerald-50 text-emerald-700 border-emerald-200" 
+                                                : "bg-indigo-50 text-indigo-700 border-indigo-200";
+                                        
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border @roleBadge">@role</span>
+                                    }
+                                </td>
+                                <td class="py-3.5 px-6">
+                                    @if (user.AssignedTenants.Count == 0)
+                                    {
+                                        <span class="text-slate-400 italic font-medium">None (Global Admin)</span>
+                                    }
+                                    else
+                                    {
+                                        <div class="flex flex-wrap gap-1">
+                                            @foreach (var at in user.AssignedTenants)
+                                            {
+                                                <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[10px] font-mono font-bold text-slate-700">
+                                                    @at.Code
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                </td>
+                                <td class="py-3.5 px-6">
+                                    @if (user.IsActive)
+                                    {
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Inactive</span>
+                                    }
+                                </td>
+                                <td class="py-3.5 px-6 text-slate-500 font-medium">@user.CreatedOn.ToString("MMM dd, yyyy")</td>
+                                <td class="py-3.5 px-6 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a href="/Admin/UsersEdit/@user.Id" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-bold transition">
+                                            Edit
+                                        </a>
+                                        <form asp-action="UsersToggleStatus" asp-route-id="@user.Id" method="post">
+                                            <button type="submit" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-lg font-bold transition">
+                                                @(user.IsActive ? "Deactivate" : "Activate")
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <partial name="_Pagination" model="Model.Users" />
+        }
+    </div>
+</div>

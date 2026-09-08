@@ -1,0 +1,267 @@
+@inject TaskBoard.Application.Security.ICurrentUserService CurrentUser
+@inject TaskBoard.Application.Security.ITenantContext TenantCtx
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ArdraKinetix Enterprise Scrum</title>
+    
+    <!-- Local Client-Side Libraries from wwwroot/lib -->
+    <script src="~/lib/tailwindcss/tailwind.min.js" asp-append-version="true"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Alpine.js for Modern Tailwind Dropdowns & Reactive UI -->
+    <script defer src="~/lib/alpinejs/cdn.min.js" asp-append-version="true"></script>
+
+    <!-- Custom Light Theme Styles -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="h-full bg-slate-50 text-slate-900 flex overflow-hidden font-sans antialiased selection:bg-indigo-500 selection:text-white">
+
+    @if (CurrentUser.IsAuthenticated)
+    {
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 transition-all z-30 shadow-sm">
+            <!-- Brand / Logo (Enlarged) -->
+            <div class="px-5 py-4 border-b border-slate-200 flex items-center">
+                <a href="/Dashboard" class="block w-full">
+                    <img src="~/images/ArdraKinetiX.png" alt="ArdraKinetix" class="h-14 w-auto max-w-full object-contain object-left drop-shadow-xs" asp-append-version="true" />
+                </a>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 px-4 py-5 space-y-1.5 overflow-y-auto">
+                <div class="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Core Workspace</div>
+                
+                <a href="/Dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Dashboard") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                    <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    Dashboard
+                </a>
+
+                <a href="/Scrum" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Scrum") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                    <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
+                    Scrum Board
+                </a>
+
+                <a href="/Tasks" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Tasks") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                    <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    All Tasks
+                </a>
+
+                @if (CurrentUser.IsInRole(SystemRoles.Admin))
+                {
+                    <div class="pt-5 px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Enterprise Administration</div>
+
+                    <a href="/Admin/Tenants" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Tenants") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        Tenants
+                    </a>
+
+                    <a href="/Admin/Users" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Users") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                        Users & Roles
+                    </a>
+
+                    <a href="/Admin/Statuses" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Statuses") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        Statuses
+                    </a>
+
+                    <a href="/Admin/Priorities" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Priorities") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Priorities
+                    </a>
+
+                    <a href="/Admin/ScrumBoards" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/ScrumBoards") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+                        Board Columns
+                    </a>
+
+                    <a href="/Admin/Audit" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Audit") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Audit Logs
+                    </a>
+                }
+            </nav>
+
+            <!-- User Session / Account Dropdown Footer -->
+            <div class="p-3 border-t border-slate-200 bg-slate-50/50" x-data="{ userMenuOpen: false }">
+                <div class="relative">
+                    <button type="button" @@click="userMenuOpen = !userMenuOpen" @@click.outside="userMenuOpen = false" class="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white hover:shadow-xs border border-transparent hover:border-slate-200 transition text-left">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center font-bold text-white text-xs shrink-0 uppercase shadow-xs">
+                                @(CurrentUser.FullName?.Substring(0, 1) ?? "U")
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold text-slate-800 truncate">@CurrentUser.FullName</p>
+                                <p class="text-[10px] text-slate-500 truncate font-medium">@CurrentUser.Role</p>
+                            </div>
+                        </div>
+                        <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="userMenuOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <!-- Tailwind Dropdown Menu (User Profile & Logout) -->
+                    <div x-show="userMenuOpen" 
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute bottom-full left-0 mb-2 w-56 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-50">
+                        
+                        <div class="px-4 py-2 border-b border-slate-100">
+                            <p class="text-xs font-bold text-slate-900 truncate">@CurrentUser.FullName</p>
+                            <p class="text-[11px] text-slate-500 truncate">@CurrentUser.Email</p>
+                            <div class="mt-1">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                    @CurrentUser.Role
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="py-1">
+                            <form asp-controller="Account" asp-action="Logout" method="post">
+                                <button type="submit" class="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition text-left">
+                                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                    Sign Out
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Sidebar Attribution -->
+                <div class="mt-2 pt-2 border-t border-slate-200/60 px-1 text-center">
+                    <p class="text-[10px] font-bold text-slate-400 tracking-tight">
+                        Powered by <span class="text-indigo-600 font-extrabold">CodeArdra Solutions</span>
+                    </p>
+                </div>
+            </div>
+        </aside>
+    }
+
+    <!-- Main Content Shell -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50">
+        @if (CurrentUser.IsAuthenticated)
+        {
+            <!-- Topbar Header -->
+            <header class="h-16 bg-white/90 border-b border-slate-200/80 backdrop-blur-md flex items-center justify-between px-8 shrink-0 z-20">
+                <div class="flex items-center gap-4">
+                    <!-- Tenant Scope Badge -->
+                    @if (TenantCtx.IsGlobalAdmin)
+                    {
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Global Admin Mode (All Tenants)
+                        </span>
+                    }
+                    else if (!string.IsNullOrEmpty(TenantCtx.TenantCode))
+                    {
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                            Tenant: <span class="font-bold">@TenantCtx.TenantCode</span>
+                        </span>
+                    }
+
+                    <!-- Developer Multi-Tenant Switcher (Tailwind CSS Dropdown) -->
+                    @if (CurrentUser.IsInRole(SystemRoles.Developer) && TenantCtx.AllowedTenantIds.Count > 1)
+                    {
+                        <div class="relative" x-data="{ tenantDropdownOpen: false }">
+                            <button type="button" 
+                                    @@click="tenantDropdownOpen = !tenantDropdownOpen" 
+                                    @@click.outside="tenantDropdownOpen = false"
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 text-xs font-semibold text-slate-700 shadow-xs transition">
+                                <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                                <span>Switch Tenant: <span class="text-indigo-600 font-bold">@(TenantCtx.TenantCode ?? "Select")</span></span>
+                                <svg class="w-3.5 h-3.5 text-slate-400 transition-transform" :class="tenantDropdownOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+
+                            <!-- Dropdown Menu -->
+                            <div x-show="tenantDropdownOpen"
+                                 x-cloak
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                 class="absolute left-0 mt-2 w-64 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-50">
+                                
+                                <div class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                                    Assigned Client Tenants
+                                </div>
+
+                                <div class="py-1 max-h-56 overflow-y-auto">
+                                    @foreach (var tId in TenantCtx.AllowedTenantIds)
+                                    {
+                                        var isCurrent = TenantCtx.TenantId == tId;
+                                        <form asp-controller="TenantSwitcher" asp-action="Switch" method="post" class="block">
+                                            <input type="hidden" name="tenantId" value="@tId" />
+                                            <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
+                                            <button type="submit" class="w-full flex items-center justify-between px-3.5 py-2 text-xs font-semibold hover:bg-indigo-50/70 transition text-left @(isCurrent ? "text-indigo-600 font-bold bg-indigo-50/40" : "text-slate-700")">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="w-2 h-2 rounded-full @(isCurrent ? "bg-indigo-600" : "bg-slate-300")"></span>
+                                                    <span>Tenant #@tId</span>
+                                                </div>
+                                                @if (isCurrent)
+                                                {
+                                                    <span class="text-[10px] font-bold text-indigo-600 bg-indigo-100/70 px-1.5 py-0.5 rounded">Active</span>
+                                                }
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <a href="/Tasks/Create" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition transform active:scale-98">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Create Task
+                    </a>
+                </div>
+            </header>
+        }
+
+        <!-- Page View Body -->
+        <main class="flex-1 overflow-y-auto p-8">
+            @RenderBody()
+        </main>
+    </div>
+
+    <!-- Toast Notifications Partial -->
+    <partial name="_ToastAlerts" />
+
+    <!-- Core Scripts -->
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,19 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="max-w-7xl mx-auto space-y-8">
+    @if (Model.Role == SystemRoles.Admin && Model.AdminDashboard != null)
+    {
+        <partial name="_AdminDashboard" model="Model.AdminDashboard" />
+    }
+    else if (Model.Role == SystemRoles.Developer && Model.DeveloperDashboard != null)
+    {
+        <partial name="_DeveloperDashboard" model="Model.DeveloperDashboard" />
+    }
+    else if (Model.TenantDashboard != null)
+    {
+        <partial name="_TenantDashboard" model="Model.TenantDashboard" />
+    }
+</div>

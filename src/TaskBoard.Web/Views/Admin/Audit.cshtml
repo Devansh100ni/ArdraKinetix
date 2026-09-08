@@ -1,0 +1,124 @@
+@model AdminAuditViewModel
+@{
+    ViewData["Title"] = "Audit Logs & Governance";
+}
+
+<div class="space-y-6 max-w-7xl mx-auto">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-black text-slate-900 tracking-tight">Enterprise Audit Trails</h2>
+            <p class="text-xs text-slate-500 mt-0.5 font-medium">Immutable audit logging for security, governance, and compliance verification.</p>
+        </div>
+    </div>
+
+    <!-- Tabs Header -->
+    <div class="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-1.5 max-w-md">
+        <a href="/Admin/Audit?tab=system" class="flex-1 py-2 px-4 rounded-xl text-xs font-bold text-center transition @(Model.ActiveTab == "system" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900")">
+            System & Security Audits
+        </a>
+        <a href="/Admin/Audit?tab=tasks" class="flex-1 py-2 px-4 rounded-xl text-xs font-bold text-center transition @(Model.ActiveTab == "tasks" ? "bg-indigo-600 text-white shadow-sm" : "text-slate-600 hover:text-slate-900")">
+            Task Mutation Audits
+        </a>
+    </div>
+
+    @if (Model.ActiveTab == "system")
+    {
+        <!-- System Audits Table -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            @if (Model.AdminAudits.Items.Count == 0)
+            {
+                <div class="p-8">
+                    <partial name="_EmptyState" model="@("No system audit events recorded yet.")" />
+                </div>
+            }
+            else
+            {
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700 font-mono">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200 font-sans">
+                            <tr>
+                                <th class="py-3.5 px-6">Timestamp (UTC)</th>
+                                <th class="py-3.5 px-6">User</th>
+                                <th class="py-3.5 px-6">Action</th>
+                                <th class="py-3.5 px-6">Entity</th>
+                                <th class="py-3.5 px-6">Details / Change Payload</th>
+                                <th class="py-3.5 px-6">IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @foreach (var a in Model.AdminAudits.Items)
+                            {
+                                <tr class="hover:bg-slate-50/80 transition">
+                                    <td class="py-3.5 px-6 text-slate-500 font-medium">@a.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                    <td class="py-3.5 px-6 font-sans font-bold text-slate-900">@a.UserFullName</td>
+                                    <td class="py-3.5 px-6">
+                                        <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-indigo-600 font-bold text-[10px]">
+                                            @a.Action
+                                        </span>
+                                    </td>
+                                    <td class="py-3.5 px-6 text-slate-800 font-sans font-semibold">@a.EntityType</td>
+                                    <td class="py-3.5 px-6 text-slate-600 max-w-md truncate font-medium" title="@a.Details">@(a.Details ?? "-")</td>
+                                    <td class="py-3.5 px-6 text-slate-500 font-medium">@(a.IpAddress ?? "127.0.0.1")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <partial name="_Pagination" model="Model.AdminAudits" />
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Task Audits Table -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            @if (Model.TaskAudits.Items.Count == 0)
+            {
+                <div class="p-8">
+                    <partial name="_EmptyState" model="@("No task audit events recorded yet.")" />
+                </div>
+            }
+            else
+            {
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-700 font-mono">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-bold text-[10px] tracking-wider border-b border-slate-200 font-sans">
+                            <tr>
+                                <th class="py-3.5 px-6">Timestamp (UTC)</th>
+                                <th class="py-3.5 px-6">Task #</th>
+                                <th class="py-3.5 px-6">User</th>
+                                <th class="py-3.5 px-6">Action</th>
+                                <th class="py-3.5 px-6">Field</th>
+                                <th class="py-3.5 px-6">Old Value</th>
+                                <th class="py-3.5 px-6">New Value</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @foreach (var ta in Model.TaskAudits.Items)
+                            {
+                                <tr class="hover:bg-slate-50/80 transition">
+                                    <td class="py-3.5 px-6 text-slate-500 font-medium">@ta.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                    <td class="py-3.5 px-6 font-bold text-indigo-600">
+                                        <a href="/Tasks/Details/@ta.TaskId" class="hover:underline">@ta.TaskNumber</a>
+                                    </td>
+                                    <td class="py-3.5 px-6 font-sans font-semibold text-slate-900">@ta.UserFullName</td>
+                                    <td class="py-3.5 px-6">
+                                        <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-indigo-600 font-bold text-[10px]">
+                                            @ta.Action
+                                        </span>
+                                    </td>
+                                    <td class="py-3.5 px-6 text-slate-700 font-medium">@(ta.FieldName ?? "-")</td>
+                                    <td class="py-3.5 px-6 text-rose-600 font-medium max-w-xs truncate" title="@ta.OldValue">@(ta.OldValue ?? "-")</td>
+                                    <td class="py-3.5 px-6 text-emerald-600 font-medium max-w-xs truncate" title="@ta.NewValue">@(ta.NewValue ?? "-")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <partial name="_Pagination" model="Model.TaskAudits" />
+            }
+        </div>
+    }
+</div>

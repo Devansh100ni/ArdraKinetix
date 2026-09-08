@@ -1,0 +1,396 @@
+@model LoginViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Sign In - ArdraKinetix Enterprise";
+}
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    
+    <!-- Local Tailwind CSS -->
+    <script src="~/lib/tailwindcss/tailwind.min.js" asp-append-version="true"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                            950: '#1e1b4b',
+                        }
+                    },
+                    boxShadow: {
+                        'glow-indigo': '0 0 50px -5px rgba(99, 102, 241, 0.25)',
+                        'glow-emerald': '0 0 50px -5px rgba(16, 185, 129, 0.2)',
+                        'glow-card': '0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 0 35px -5px rgba(99, 102, 241, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        /* Ambient Animated Tech Gradient Grid Background */
+        .grid-background {
+            background-size: 36px 36px;
+            background-image: 
+                linear-gradient(to right, rgba(99, 102, 241, 0.09) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(99, 102, 241, 0.09) 1px, transparent 1px);
+            mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 40%, transparent 90%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 40%, transparent 90%);
+        }
+
+        .ambient-mesh {
+            background: radial-gradient(circle at 15% 25%, rgba(99, 102, 241, 0.14) 0%, transparent 40%),
+                        radial-gradient(circle at 85% 20%, rgba(139, 92, 246, 0.16) 0%, transparent 45%),
+                        radial-gradient(circle at 50% 85%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.09) 0%, transparent 40%);
+        }
+
+        .grid-node-glow {
+            animation: pulseNode 3.5s ease-in-out infinite;
+        }
+
+        @@keyframes pulseNode {
+            0%, 100% { opacity: 0.25; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.5); }
+        }
+
+        /* Smooth CSS Entrances */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased selection:bg-indigo-500 selection:text-white relative overflow-x-hidden flex flex-col justify-between">
+
+    <!-- ========================================== -->
+    <!-- AMBIENT BACKGROUND GRADIENT GRID CANVAS -->
+    <!-- ========================================== -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <!-- Multi-Color Ambient Mesh Gradient -->
+        <div class="absolute inset-0 ambient-mesh"></div>
+        
+        <!-- Precision Grid Overlay with Radial Falloff -->
+        <div class="absolute inset-0 grid-background"></div>
+
+        <!-- Floating Aurora Glow Spheres (Continuous GSAP Drift) -->
+        <div id="glow-orb-1" class="absolute -top-32 -left-32 w-[34rem] h-[34rem] bg-indigo-300/40 rounded-full blur-[100px] pointer-events-none"></div>
+        <div id="glow-orb-2" class="absolute top-1/4 -right-32 w-[32rem] h-[32rem] bg-violet-300/40 rounded-full blur-[110px] pointer-events-none"></div>
+        <div id="glow-orb-3" class="absolute -bottom-32 left-1/3 w-[36rem] h-[36rem] bg-emerald-200/40 rounded-full blur-[120px] pointer-events-none"></div>
+        <div id="glow-orb-4" class="absolute bottom-10 right-1/4 w-[26rem] h-[26rem] bg-amber-200/30 rounded-full blur-[90px] pointer-events-none"></div>
+
+        <!-- Grid Intersection Glowing Nodes -->
+        <div class="absolute top-28 left-1/4 w-2 h-2 rounded-full bg-indigo-500 shadow-glow-indigo grid-node-glow"></div>
+        <div class="absolute top-44 right-1/3 w-2 h-2 rounded-full bg-violet-500 shadow-glow-indigo grid-node-glow" style="animation-delay: 1.2s;"></div>
+        <div class="absolute bottom-32 left-1/3 w-2 h-2 rounded-full bg-emerald-500 shadow-glow-emerald grid-node-glow" style="animation-delay: 2.4s;"></div>
+        <div class="absolute bottom-20 right-1/4 w-2 h-2 rounded-full bg-indigo-400 shadow-glow-indigo grid-node-glow" style="animation-delay: 0.8s;"></div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TOP HEADER BRANDING & SYSTEM STATUS -->
+    <!-- ========================================== -->
+    <header class="relative z-20 w-full px-6 py-4 border-b border-slate-200/60 bg-white/60 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <!-- Brand Lockup -->
+            <div class="flex items-center gap-3">
+                <img src="~/images/ArdraKinetiX.png" alt="ArdraKinetix" class="h-11 w-auto max-w-[220px] object-contain" asp-append-version="true" />
+                <span class="hidden md:inline-block h-4 w-px bg-slate-300"></span>
+                <span class="hidden md:inline-block text-xs font-semibold text-slate-500">Enterprise Scrum & Agile Platform</span>
+            </div>
+
+            <!-- Right Status Pill & Attribution -->
+            <div class="flex items-center gap-3">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="hidden sm:inline">All Systems Operational 99.99%</span>
+                    <span class="sm:hidden">Active</span>
+                </div>
+
+                <div class="hidden sm:flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-xs font-bold text-indigo-700">
+                    <svg class="w-3.5 h-3.5 text-indigo-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path></svg>
+                    <span>Co-powered by CodeArdra Solutions</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================== -->
+    <!-- MAIN INTERACTIVE LOGIN & SHOWCASE VIEWPORT -->
+    <!-- ========================================== -->
+    <main class="relative z-10 flex-1 flex items-center justify-center py-6 sm:py-10 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            <!-- ========================================== -->
+            <!-- LEFT COLUMN: Brand Story & Highlights -->
+            <!-- ========================================== -->
+            <div class="lg:col-span-6 space-y-6">
+                
+                <!-- Badge -->
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-slate-200 shadow-2xs text-xs font-semibold text-slate-700">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="font-bold text-slate-900">ArdraKinetix Enterprise</span>
+                        <span class="text-slate-300">&bull;</span>
+                        <span class="text-indigo-600 font-bold">Co-powered by CodeArdra Solutions</span>
+                    </div>
+                </div>
+
+                <!-- Prominent Big Brand Logo -->
+                <div class="pt-1">
+                    <img src="~/images/ArdraKinetiX.png" alt="ArdraKinetix Logo" class="h-16 sm:h-20 md:h-24 w-auto object-contain drop-shadow-sm" asp-append-version="true" />
+                </div>
+
+                <!-- Hero Headline -->
+                <div class="space-y-2">
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                        Deliver sprint velocity with 
+                        <span class="bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-700 bg-clip-text text-transparent">deterministic tenant orchestration.</span>
+                    </h1>
+                    <p class="text-sm sm:text-base text-slate-600 font-medium leading-relaxed">
+                        A multi-tenant task board platform engineered with clean architecture, strict tenant partition isolation, drag-and-drop Scrum execution, and automated PBKDF2 cryptography.
+                    </p>
+                </div>
+
+                <!-- Feature Highlights -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                    <!-- Feature 1 -->
+                    <div class="bg-white/90 backdrop-blur-sm p-4 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md transition duration-200 group">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        </div>
+                        <h2 class="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">100% Tenant Isolation</h2>
+                        <p class="text-[11px] text-slate-500 mt-1 font-medium leading-normal">
+                            Row-level security boundaries and automated <span class="font-mono text-indigo-600 font-semibold">{PREFIX}-000001</span> sequence counters.
+                        </p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="bg-white/90 backdrop-blur-sm p-4 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md transition duration-200 group">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center mb-2.5 group-hover:scale-110 transition-transform">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
+                        </div>
+                        <h2 class="text-xs font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">Interactive Scrum Flow</h2>
+                        <p class="text-[11px] text-slate-500 mt-1 font-medium leading-normal">
+                            Dynamic columns, real-time WIP limits, subtask hierarchies, and drag-and-drop state sync.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Trust Badges -->
+                <div class="flex items-center gap-5 pt-1 border-t border-slate-200/80 text-xs text-slate-500 font-semibold">
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        <span>Evolve Migrations</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        <span>Full Audit Trail</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-violet-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        <span>JWT Tenant Scopes</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ========================================== -->
+            <!-- RIGHT COLUMN: Modern SaaS Login Card -->
+            <!-- ========================================== -->
+            <div class="lg:col-span-6 w-full max-w-md mx-auto">
+                <div id="login-card-container" class="relative bg-white/95 backdrop-blur-2xl p-7 sm:p-9 rounded-3xl border border-slate-200 shadow-glow-card transition-all duration-300 animate-fade-in-up">
+                    
+                    <!-- Top Accent Border Glow Bar -->
+                    <div class="absolute -top-px left-8 right-8 h-[3px] bg-gradient-to-r from-indigo-500 via-violet-500 to-emerald-500 rounded-full"></div>
+
+                    <!-- Card Header -->
+                    <div class="mb-5">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-2xl font-black text-slate-900 tracking-tight">Sign In to Workspace</h2>
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">Tenant Gateway</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1 font-medium">Enter your credentials or choose a 1-click demo role below.</p>
+                    </div>
+
+                    <!-- Error Message Banner -->
+                    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                    {
+                        <div class="mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <span>@Model.ErrorMessage</span>
+                        </div>
+                    }
+
+                    <!-- Sign In Form -->
+                    <form asp-controller="Account" asp-action="Login" method="post" class="space-y-3.5" id="loginForm">
+                        <input type="hidden" asp-for="ReturnUrl" />
+
+                        <!-- Username / Email Field -->
+                        <div>
+                            <label asp-for="Identifier" class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">Username or Email</label>
+                            <div class="relative group">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                </span>
+                                <input asp-for="Identifier" id="Identifier" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-2xs" placeholder="e.g. admin or devuser" required autofocus />
+                            </div>
+                            <span asp-validation-for="Identifier" class="text-xs text-rose-600 mt-0.5 block font-medium"></span>
+                        </div>
+
+                        <!-- Password Field with Show/Hide Toggle -->
+                        <div x-data="{ showPass: false }">
+                            <div class="flex items-center justify-between mb-1">
+                                <label asp-for="Password" class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider">Password</label>
+                                <button type="button" @@click="showPass = !showPass" class="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 transition">
+                                    <span x-text="showPass ? 'Hide Password' : 'Show Password'"></span>
+                                </button>
+                            </div>
+                            <div class="relative group">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                </span>
+                                <input asp-for="Password" id="Password" :type="showPass ? 'text' : 'password'" class="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-2xs" placeholder="••••••••••••" required />
+                                <button type="button" @@click="showPass = !showPass" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                                    <svg x-show="!showPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    <svg x-show="showPass" x-cloak class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path></svg>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-xs text-rose-600 mt-0.5 block font-medium"></span>
+                        </div>
+
+                        <!-- Remember Me Toggle -->
+                        <div class="flex items-center justify-between text-xs pt-0.5">
+                            <label class="flex items-center gap-2 cursor-pointer select-none text-slate-600 hover:text-slate-900">
+                                <input asp-for="RememberMe" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                                <span class="font-medium">Stay signed in</span>
+                            </label>
+                            <span class="text-slate-400 text-[11px] font-mono">Auto Scoped</span>
+                        </div>
+
+                        <!-- Submit CTA Button -->
+                        <button type="submit" id="submitBtn" class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 via-indigo-700 to-indigo-800 hover:from-indigo-700 hover:to-indigo-900 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-500/25 transition transform active:scale-98 flex items-center justify-center gap-2 group">
+                            <span>Sign In to Workspace</span>
+                            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </button>
+                    </form>
+
+                    <!-- ========================================== -->
+                    <!-- 1-Click Interactive Demo Role Selector -->
+                    <!-- ========================================== -->
+                    <div class="mt-6 pt-5 border-t border-slate-100" x-data="{ selectedDemo: '' }">
+                        <div class="flex items-center justify-between mb-2.5">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">1-Click Demo Accounts</p>
+                            <span class="text-[10px] text-indigo-600 font-bold" x-show="selectedDemo" x-text="`Loaded: ${selectedDemo}`"></span>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-2 text-xs">
+                            <!-- Admin Demo Card -->
+                            <button type="button" 
+                                    id="btnDemoAdmin"
+                                    @@click="fillCredentials('admin', 'AdminPassword123!', 'btnDemoAdmin'); selectedDemo = 'Global Admin'"
+                                    class="p-2 rounded-xl bg-slate-50 border border-slate-200 hover:border-purple-400 hover:bg-purple-50/50 text-left transition duration-150 group">
+                                <div class="flex items-center justify-between mb-0.5">
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-purple-100 text-purple-700">Admin</span>
+                                </div>
+                                <div class="font-bold text-slate-800 text-[11px] group-hover:text-purple-700 truncate">admin</div>
+                                <div class="text-[9px] text-slate-400 font-mono">Global Scope</div>
+                            </button>
+
+                            <!-- Developer Demo Card -->
+                            <button type="button" 
+                                    id="btnDemoDev"
+                                    @@click="fillCredentials('devuser', 'Developer123!', 'btnDemoDev'); selectedDemo = 'Developer'"
+                                    class="p-2 rounded-xl bg-slate-50 border border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 text-left transition duration-150 group">
+                                <div class="flex items-center justify-between mb-0.5">
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-emerald-100 text-emerald-700">Dev</span>
+                                </div>
+                                <div class="font-bold text-slate-800 text-[11px] group-hover:text-emerald-700 truncate">devuser</div>
+                                <div class="text-[9px] text-slate-400 font-mono">Multi-Tenant</div>
+                            </button>
+
+                            <!-- Acme User Demo Card -->
+                            <button type="button" 
+                                    id="btnDemoAcme"
+                                    @@click="fillCredentials('acmeuser', 'TenantUser123!', 'btnDemoAcme'); selectedDemo = 'Acme User'"
+                                    class="p-2 rounded-xl bg-slate-50 border border-slate-200 hover:border-amber-400 hover:bg-amber-50/50 text-left transition duration-150 group">
+                                <div class="flex items-center justify-between mb-0.5">
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-100 text-amber-700">Tenant</span>
+                                </div>
+                                <div class="font-bold text-slate-800 text-[11px] group-hover:text-amber-700 truncate">acmeuser</div>
+                                <div class="text-[9px] text-slate-400 font-mono">Acme Corp</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Card Footer Attribution -->
+                    <div class="mt-5 pt-3.5 border-t border-slate-100 text-center space-y-1">
+                        <p class="text-xs font-semibold text-slate-600">
+                            Co-powered by <span class="text-indigo-600 font-bold">CodeArdra Solutions</span>
+                        </p>
+                        <p class="text-[10px] text-slate-400">
+                            Protected by PBKDF2 HMAC-SHA512 &bull; <a href="#" class="text-indigo-600 hover:underline font-semibold">Security Policy</a>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ========================================== -->
+    <!-- BOTTOM FOOTER -->
+    <!-- ========================================== -->
+    <footer class="relative z-20 border-t border-slate-200/80 bg-white/70 backdrop-blur-md py-4 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+            <div class="flex items-center gap-2">
+                <img src="~/images/ArdraKinetiX.png" alt="ArdraKinetix" class="h-5 w-auto object-contain opacity-75" asp-append-version="true" />
+                <span>&copy; @DateTime.UtcNow.Year ArdraKinetix Enterprise. All rights reserved.</span>
+            </div>
+            <div class="flex items-center gap-4 font-semibold text-[11px]">
+                <span class="text-indigo-600">Co-powered by CodeArdra Solutions</span>
+                <span>&bull;</span>
+                <a href="#" class="hover:text-indigo-600 transition">Privacy Policy</a>
+                <span>&bull;</span>
+                <a href="#" class="hover:text-indigo-600 transition">Security SLA</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================== -->
+    <!-- SCRIPTS: GSAP, ALPINE & LOGIN CLIENT LOGIC -->
+    <!-- ========================================== -->
+    <script src="~/lib/gsap/gsap.min.js" asp-append-version="true"></script>
+    <script defer src="~/lib/alpinejs/cdn.min.js" asp-append-version="true"></script>
+    <script src="~/js/login.js" asp-append-version="true"></script>
+</body>
+</html>

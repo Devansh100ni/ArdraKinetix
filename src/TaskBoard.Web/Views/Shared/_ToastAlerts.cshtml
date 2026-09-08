@@ -1,0 +1,29 @@
+<!-- Toast notification container and server-side Flash alert triggers -->
+<div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3 pointer-events-none max-w-md w-full"></div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.TaskBoard.showToast('@Html.Raw(TempData["SuccessMessage"])', 'success');
+        });
+    </script>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.TaskBoard.showToast('@Html.Raw(TempData["ErrorMessage"])', 'error');
+        });
+    </script>
+}
+
+@if (TempData["WarningMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            window.TaskBoard.showToast('@Html.Raw(TempData["WarningMessage"])', 'warning');
+        });
+    </script>
+}

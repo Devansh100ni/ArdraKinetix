@@ -8,7 +8,7 @@
     <!-- Breadcrumb & Actions Header -->
     <div class="flex items-center justify-between flex-wrap gap-4">
         <div class="flex items-center gap-2 text-xs text-slate-500 font-medium">
-            <a href="/Tasks" class="hover:text-indigo-600">Tasks</a>
+            <a href="/Tasks" class="hover:text-sky-600">Tasks</a>
             <span>/</span>
             <span class="px-2 py-0.5 rounded-lg bg-slate-100 text-slate-700 font-mono text-[11px] font-bold">@Model.Task.TenantCode</span>
             <span>/</span>
@@ -19,7 +19,7 @@
             @if (Model.CanEdit)
             {
                 <a href="/Tasks/Edit/@Model.Task.Id" class="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 shadow-2xs transition flex items-center gap-2">
-                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                     Edit Task
                 </a>
             }
@@ -40,7 +40,7 @@
         <div class="flex items-start justify-between flex-wrap gap-4 mb-4">
             <div>
                 <div class="flex items-center gap-3 mb-2">
-                    <span class="font-mono text-sm font-bold text-indigo-600">@Model.Task.TaskNumber</span>
+                    <span class="font-mono text-sm font-bold text-sky-600">@Model.Task.TaskNumber</span>
                     <span class="px-3 py-1 rounded-full text-xs font-bold border"
                           style="background-color: @(Model.Task.StatusColor)15; color: @Model.Task.StatusColor; border-color: @(Model.Task.StatusColor)40;">
                         @Model.Task.StatusName
@@ -61,19 +61,19 @@
 
         <!-- Tab Navigation -->
         <div class="flex items-center gap-2 border-b border-slate-100 pt-4 overflow-x-auto">
-            <button onclick="window.TaskBoard.switchTab('overview')" data-tab-button="overview" class="px-4 py-2.5 rounded-t-xl text-xs font-bold border-b-2 transition @(Model.ActiveTab == "overview" ? "text-indigo-600 border-indigo-600 bg-indigo-50/80" : "text-slate-500 border-transparent hover:text-slate-900")">
+            <button onclick="window.TaskBoard.switchTab('overview')" data-tab-button="overview" class="px-4 py-2.5 rounded-t-xl text-xs font-bold border-b-2 transition @(Model.ActiveTab == "overview" ? "text-sky-600 border-sky-600 bg-sky-50/80" : "text-slate-500 border-transparent hover:text-slate-900")">
                 Overview
             </button>
-            <button onclick="window.TaskBoard.switchTab('comments')" data-tab-button="comments" class="px-4 py-2.5 rounded-t-xl text-xs font-bold border-b-2 transition @(Model.ActiveTab == "comments" ? "text-indigo-600 border-indigo-600 bg-indigo-50/80" : "text-slate-500 border-transparent hover:text-slate-900")">
+            <button onclick="window.TaskBoard.switchTab('comments')" data-tab-button="comments" class="px-4 py-2.5 rounded-t-xl text-xs font-bold border-b-2 transition @(Model.ActiveTab == "comments" ? "text-sky-600 border-sky-600 bg-sky-50/80" : "text-slate-500 border-transparent hover:text-slate-900")">
                 Comments (@Model.Task.Comments.Count)
             </button>
-            <button onclick="window.TaskBoard.switchTab('subtasks')" data-tab-button="subtasks" class="px-4 py-2.5 rounded-t-xl text-xs font-bold border-b-2 transition @(Model.ActiveTab == "subtasks" ? "text-indigo-600 border-indigo-600 bg-indigo-50/80" : "text-slate-500 border-transparent hover:text-slate-900")">
+            <button onclick="window.TaskBoard.switchTab('subtasks')" data-tab-button="subtasks" class="px-4 py-2.5 rounded-t-xl text-xs font-bold border-b-2 transition @(Model.ActiveTab == "subtasks" ? "text-sky-600 border-sky-600 bg-sky-50/80" : "text-slate-500 border-transparent hover:text-slate-900")">
                 Subtasks (@Model.Task.ChildTasks.Count)
             </button>
-            <button onclick="window.TaskBoard.switchTab('attachments')" data-tab-button="attachments" class="px-4 py-2.5 rounded-t-xl text-xs font-bold border-b-2 transition @(Model.ActiveTab == "attachments" ? "text-indigo-600 border-indigo-600 bg-indigo-50/80" : "text-slate-500 border-transparent hover:text-slate-900")">
+            <button onclick="window.TaskBoard.switchTab('attachments')" data-tab-button="attachments" class="px-4 py-2.5 rounded-t-xl text-xs font-bold border-b-2 transition @(Model.ActiveTab == "attachments" ? "text-sky-600 border-sky-600 bg-sky-50/80" : "text-slate-500 border-transparent hover:text-slate-900")">
                 Attachments (@Model.Task.Attachments.Count)
             </button>
-            <button onclick="window.TaskBoard.switchTab('audit')" data-tab-button="audit" class="px-4 py-2.5 rounded-t-xl text-xs font-bold border-b-2 transition @(Model.ActiveTab == "audit" ? "text-indigo-600 border-indigo-600 bg-indigo-50/80" : "text-slate-500 border-transparent hover:text-slate-900")">
+            <button onclick="window.TaskBoard.switchTab('audit')" data-tab-button="audit" class="px-4 py-2.5 rounded-t-xl text-xs font-bold border-b-2 transition @(Model.ActiveTab == "audit" ? "text-sky-600 border-sky-600 bg-sky-50/80" : "text-slate-500 border-transparent hover:text-slate-900")">
                 History & Audits (@Model.Task.Audits.Count)
             </button>
         </div>
@@ -99,12 +99,12 @@
                 {
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Parent Task</h3>
-                        <a href="/Tasks/Details/@Model.Task.ParentTask.Id" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-indigo-400 transition group">
+                        <a href="/Tasks/Details/@Model.Task.ParentTask.Id" class="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-sky-400 transition group">
                             <div>
-                                <span class="font-mono text-xs font-bold text-indigo-600 mr-2">@Model.Task.ParentTask.TaskNumber</span>
-                                <span class="text-sm font-semibold text-slate-800 group-hover:text-indigo-600">@Model.Task.ParentTask.Title</span>
+                                <span class="font-mono text-xs font-bold text-sky-600 mr-2">@Model.Task.ParentTask.TaskNumber</span>
+                                <span class="text-sm font-semibold text-slate-800 group-hover:text-sky-600">@Model.Task.ParentTask.Title</span>
                             </div>
-                            <span class="text-xs text-indigo-600 font-bold">&rarr;</span>
+                            <span class="text-xs text-sky-600 font-bold">&rarr;</span>
                         </a>
                     </div>
                 }
@@ -121,7 +121,7 @@
                         @if (Model.Task.AssignedUser != null)
                         {
                             <div class="flex items-center gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-200">
-                                <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center text-xs uppercase">
+                                <div class="w-7 h-7 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center text-xs uppercase">
                                     @Model.Task.AssignedUser.FullName.Substring(0, 1)
                                 </div>
                                 <div>
@@ -176,9 +176,9 @@
             <form id="addCommentForm" onsubmit="submitComment(event)">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="TaskId" value="@Model.Task.Id" />
-                <textarea id="commentInput" name="Comment" rows="3" required placeholder="Write your task updates, blocker notes, or progress comments..." class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs"></textarea>
+                <textarea id="commentInput" name="Comment" rows="3" required placeholder="Write your task updates, blocker notes, or progress comments..." class="w-full p-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 focus:outline-none shadow-2xs"></textarea>
                 <div class="flex justify-end mt-3">
-                    <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition">
                         Post Comment
                     </button>
                 </div>
@@ -196,7 +196,7 @@
                 @foreach (var comment in Model.Task.Comments)
                 {
                     <div id="comment-@comment.Id" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-start gap-4">
-                        <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shrink-0 uppercase">
+                        <div class="w-8 h-8 rounded-lg bg-sky-600 text-white font-bold flex items-center justify-center text-xs shrink-0 uppercase">
                             @comment.UserFullName.Substring(0, 1)
                         </div>
                         <div class="flex-1 min-w-0">
@@ -224,7 +224,7 @@
     <div data-tab-content="subtasks" class="space-y-6 @(Model.ActiveTab == "subtasks" ? "" : "hidden")">
         <div class="flex items-center justify-between">
             <h3 class="text-sm font-bold text-slate-900">Child Subtasks Hierarchy</h3>
-            <a href="/Tasks/Create?parentTaskId=@Model.Task.Id&tenantId=@Model.Task.TenantId" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+            <a href="/Tasks/Create?parentTaskId=@Model.Task.Id&tenantId=@Model.Task.TenantId" class="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition">
                 + Create Subtask
             </a>
         </div>
@@ -257,7 +257,7 @@
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="taskId" value="@Model.Task.Id" />
                 <input type="file" id="attachmentFileInput" name="file" accept=".png,.jpg,.jpeg,.webp,.pdf" required class="text-xs text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 cursor-pointer" />
-                <button type="submit" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+                <button type="submit" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition">
                     Upload Attachment
                 </button>
             </form>
@@ -277,7 +277,7 @@
                 {
                     <div id="attachment-@att.Id" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between space-y-3">
                         <div class="flex items-start gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0 text-indigo-600">
+                            <div class="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0 text-sky-600">
                                 @if (att.IsImage)
                                 {
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -301,7 +301,7 @@
                         }
 
                         <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs">
-                            <a href="@att.DownloadUrl" class="text-indigo-600 hover:text-indigo-700 font-bold flex items-center gap-1">
+                            <a href="@att.DownloadUrl" class="text-sky-600 hover:text-sky-700 font-bold flex items-center gap-1">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                 Download
                             </a>
@@ -348,7 +348,7 @@
                                     <td class="py-3.5 px-6 text-slate-500 font-medium">@a.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss")</td>
                                     <td class="py-3.5 px-6 font-sans font-semibold text-slate-900">@a.UserFullName</td>
                                     <td class="py-3.5 px-6">
-                                        <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-indigo-600 font-bold text-[10px]">
+                                        <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-sky-600 font-bold text-[10px]">
                                             @a.Action
                                         </span>
                                     </td>

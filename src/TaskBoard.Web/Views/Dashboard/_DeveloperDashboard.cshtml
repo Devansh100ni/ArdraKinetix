@@ -8,7 +8,7 @@
     </div>
 
     <div class="flex items-center gap-3">
-        <a href="/Scrum" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+        <a href="/Scrum" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition">
             Open Scrum Board &rarr;
         </a>
     </div>
@@ -22,7 +22,7 @@
         <div class="flex flex-wrap gap-1.5 mt-2.5">
             @foreach (var t in Model.AssignedTenants)
             {
-                <span class="px-2 py-0.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 font-mono text-[10px] font-bold">
+                <span class="px-2 py-0.5 rounded-lg bg-sky-50 border border-sky-200 text-sky-700 font-mono text-[10px] font-bold">
                     @t.Code
                 </span>
             }
@@ -32,7 +32,7 @@
     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
         <div class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">My Assigned Tasks</div>
         <div class="text-3xl font-black text-slate-900">@Model.MyAssignedTasksCount</div>
-        <div class="text-[11px] text-indigo-600 mt-2 font-semibold">Assigned directly to you</div>
+        <div class="text-[11px] text-sky-600 mt-2 font-semibold">Assigned directly to you</div>
     </div>
 
     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -55,7 +55,7 @@
             <h3 class="text-base font-bold text-slate-900">My Active Tasks</h3>
             <p class="text-xs text-slate-500 mt-0.5">Tasks assigned to your user account across all authorized tenants.</p>
         </div>
-        <a href="/Tasks" class="text-xs font-bold text-indigo-600 hover:text-indigo-700">View All Tasks &rarr;</a>
+        <a href="/Tasks" class="text-xs font-bold text-sky-600 hover:text-sky-700">View All Tasks &rarr;</a>
     </div>
 
     @if (Model.MyTasks.Count == 0)
@@ -82,7 +82,7 @@
                     {
                         <tr class="hover:bg-slate-50/80 transition">
                             <td class="py-3.5 px-6 font-medium">
-                                <a href="/Tasks/Details/@task.Id" class="font-mono font-bold text-indigo-600 hover:underline mr-2">@task.TaskNumber</a>
+                                <a href="/Tasks/Details/@task.Id" class="font-mono font-bold text-sky-600 hover:underline mr-2">@task.TaskNumber</a>
                                 <span class="text-slate-800 font-medium">@task.Title</span>
                             </td>
                             <td class="py-3.5 px-6">

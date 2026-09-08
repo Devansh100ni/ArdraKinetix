@@ -26,6 +26,7 @@ public static class DependencyInjection
             {
                 sqlOptions.MigrationsAssembly(typeof(TaskBoardDbContext).Assembly.FullName);
                 sqlOptions.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorNumbersToAdd: null);
+                sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
             }));
 
         // Repositories & UnitOfWork

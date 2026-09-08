@@ -106,7 +106,7 @@ function fillCredentials(identifier, password, btnId) {
     // Flash highlight on the active input fields
     [idInput, passInput].forEach(el => {
         if (!el) return;
-        el.classList.add('bg-indigo-50/70', 'border-indigo-400');
-        setTimeout(() => el.classList.remove('bg-indigo-50/70', 'border-indigo-400'), 500);
+        el.classList.add('bg-sky-50/70', 'border-sky-400');
+        setTimeout(() => el.classList.remove('bg-sky-50/70', 'border-sky-400'), 500);
     });
 }

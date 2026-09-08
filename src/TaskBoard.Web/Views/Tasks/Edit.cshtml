@@ -7,13 +7,13 @@
     <div class="flex items-center justify-between">
         <div>
             <div class="flex items-center gap-2">
-                <span class="font-mono text-xs font-bold text-indigo-600">@Model.TaskNumber</span>
+                <span class="font-mono text-xs font-bold text-sky-600">@Model.TaskNumber</span>
                 <span class="text-xs text-slate-400">&bull;</span>
                 <h2 class="text-2xl font-black text-slate-900 tracking-tight">Edit Task</h2>
             </div>
             <p class="text-xs text-slate-500 mt-0.5 font-medium">Modify task details, assignee, dates, or workflow status.</p>
         </div>
-        <a href="/Tasks/Details/@Model.Id" class="text-xs font-bold text-indigo-600 hover:text-indigo-700">&larr; Back to Details</a>
+        <a href="/Tasks/Details/@Model.Id" class="text-xs font-bold text-sky-600 hover:text-sky-700">&larr; Back to Details</a>
     </div>
 
     <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
@@ -29,64 +29,198 @@
             <!-- Task Title -->
             <div>
                 <label asp-for="Title" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Task Title *</label>
-                <input asp-for="Title" required class="w-full py-2.5 px-4 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs" />
+                <input asp-for="Title" required class="w-full py-2.5 px-4 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 focus:outline-none shadow-2xs" />
                 <span asp-validation-for="Title" class="text-xs text-rose-600 mt-1 block"></span>
             </div>
 
             <!-- Description -->
             <div>
                 <label asp-for="Description" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Description</label>
-                <textarea asp-for="Description" rows="4" class="w-full p-3.5 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs"></textarea>
+                <textarea asp-for="Description" rows="4" class="w-full p-3.5 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 focus:outline-none shadow-2xs"></textarea>
                 <span asp-validation-for="Description" class="text-xs text-rose-600 mt-1 block"></span>
             </div>
 
             <!-- Status & Priority Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label asp-for="StatusId" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Status *</label>
-                    <select asp-for="StatusId" required class="w-full py-2.5 px-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs">
+                @{
+                    var currentStatus = Model.AvailableStatuses.FirstOrDefault(s => s.Id == Model.StatusId);
+                    var currentStatusVal = Model.StatusId.ToString();
+                    var currentStatusLabel = currentStatus?.Name ?? "Select Status";
+                }
+                <div class="relative" x-data="{ open: false, selectedVal: '@currentStatusVal', selectedLabel: '@currentStatusLabel' }">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Status *</label>
+                    <input type="hidden" name="StatusId" :value="selectedVal" required />
+                    
+                    <button type="button" 
+                            @@click="open = !open" 
+                            @@click.outside="open = false" 
+                            class="w-full flex items-center justify-between py-2.5 px-3.5 bg-white border border-slate-300 hover:border-sky-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none shadow-2xs transition text-left">
+                        <span x-text="selectedLabel" class="truncate"></span>
+                        <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <div x-show="open" 
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute left-0 mt-1.5 w-full rounded-2xl bg-white border border-slate-200 shadow-xl py-1.5 z-50 max-h-56 overflow-y-auto">
                         @foreach (var s in Model.AvailableStatuses)
                         {
-                            <option value="@s.Id" selected="@(Model.StatusId == s.Id)">@s.Name</option>
+                            <button type="button" 
+                                    @@click="selectedVal = '@s.Id'; selectedLabel = '@s.Name'; open = false" 
+                                    class="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                                    :class="selectedVal === '@s.Id' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                                <div class="flex items-center gap-2 truncate">
+                                    <span class="w-2.5 h-2.5 rounded-full" style="background-color: @s.Color;"></span>
+                                    <span class="truncate">@s.Name</span>
+                                </div>
+                                <span x-show="selectedVal === '@s.Id'" class="text-sky-600 font-bold">&check;</span>
+                            </button>
                         }
-                    </select>
+                    </div>
                     <span asp-validation-for="StatusId" class="text-xs text-rose-600 mt-1 block"></span>
                 </div>
 
-                <div>
-                    <label asp-for="PriorityId" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Priority *</label>
-                    <select asp-for="PriorityId" required class="w-full py-2.5 px-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs">
+                @{
+                    var currentPriority = Model.AvailablePriorities.FirstOrDefault(p => p.Id == Model.PriorityId);
+                    var currentPriorityVal = Model.PriorityId.ToString();
+                    var currentPriorityLabel = currentPriority?.Name ?? "Select Priority";
+                }
+                <div class="relative" x-data="{ open: false, selectedVal: '@currentPriorityVal', selectedLabel: '@currentPriorityLabel' }">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Priority *</label>
+                    <input type="hidden" name="PriorityId" :value="selectedVal" required />
+                    
+                    <button type="button" 
+                            @@click="open = !open" 
+                            @@click.outside="open = false" 
+                            class="w-full flex items-center justify-between py-2.5 px-3.5 bg-white border border-slate-300 hover:border-sky-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none shadow-2xs transition text-left">
+                        <span x-text="selectedLabel" class="truncate"></span>
+                        <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <div x-show="open" 
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute left-0 mt-1.5 w-full rounded-2xl bg-white border border-slate-200 shadow-xl py-1.5 z-50 max-h-56 overflow-y-auto">
                         @foreach (var p in Model.AvailablePriorities)
                         {
-                            <option value="@p.Id" selected="@(Model.PriorityId == p.Id)">@p.Name</option>
+                            <button type="button" 
+                                    @@click="selectedVal = '@p.Id'; selectedLabel = '@p.Name'; open = false" 
+                                    class="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                                    :class="selectedVal === '@p.Id' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                                <div class="flex items-center gap-2 truncate">
+                                    <span class="w-2.5 h-2.5 rounded-full" style="background-color: @p.Color;"></span>
+                                    <span class="truncate">@p.Name</span>
+                                </div>
+                                <span x-show="selectedVal === '@p.Id'" class="text-sky-600 font-bold">&check;</span>
+                            </button>
                         }
-                    </select>
+                    </div>
                     <span asp-validation-for="PriorityId" class="text-xs text-rose-600 mt-1 block"></span>
                 </div>
             </div>
 
             <!-- Assignee & Parent Task -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label asp-for="AssignedUserId" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Assignee</label>
-                    <select asp-for="AssignedUserId" class="w-full py-2.5 px-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs">
-                        <option value="">-- Unassigned --</option>
+                @{
+                    var currentAssignee = Model.AvailableUsers.FirstOrDefault(u => u.Id == Model.AssignedUserId);
+                    var currentAssigneeVal = Model.AssignedUserId?.ToString() ?? "";
+                    var currentAssigneeLabel = currentAssignee != null ? $"{currentAssignee.FullName} ({currentAssignee.Email})" : "-- Unassigned --";
+                }
+                <div class="relative" x-data="{ open: false, selectedVal: '@currentAssigneeVal', selectedLabel: '@currentAssigneeLabel' }">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Assignee</label>
+                    <input type="hidden" name="AssignedUserId" :value="selectedVal" />
+                    
+                    <button type="button" 
+                            @@click="open = !open" 
+                            @@click.outside="open = false" 
+                            class="w-full flex items-center justify-between py-2.5 px-3.5 bg-white border border-slate-300 hover:border-sky-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none shadow-2xs transition text-left">
+                        <span x-text="selectedLabel" class="truncate"></span>
+                        <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <div x-show="open" 
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute left-0 mt-1.5 w-full rounded-2xl bg-white border border-slate-200 shadow-xl py-1.5 z-50 max-h-56 overflow-y-auto">
+                        <button type="button" 
+                                @@click="selectedVal = ''; selectedLabel = '-- Unassigned --'; open = false" 
+                                class="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                                :class="selectedVal === '' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                            <span>-- Unassigned --</span>
+                            <span x-show="selectedVal === ''" class="text-sky-600 font-bold">&check;</span>
+                        </button>
                         @foreach (var u in Model.AvailableUsers)
                         {
-                            <option value="@u.Id" selected="@(Model.AssignedUserId == u.Id)">@u.FullName (@u.Email)</option>
+                            <button type="button" 
+                                    @@click="selectedVal = '@u.Id'; selectedLabel = '@u.FullName (@u.Email)'; open = false" 
+                                    class="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                                    :class="selectedVal === '@u.Id' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                                <span class="truncate">@u.FullName (@u.Email)</span>
+                                <span x-show="selectedVal === '@u.Id'" class="text-sky-600 font-bold">&check;</span>
+                            </button>
                         }
-                    </select>
+                    </div>
                 </div>
 
-                <div>
-                    <label asp-for="ParentTaskId" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Parent Task</label>
-                    <select asp-for="ParentTaskId" class="w-full py-2.5 px-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs">
-                        <option value="">-- No Parent (Root Task) --</option>
+                @{
+                    var currentParent = Model.AvailableParentTasks.FirstOrDefault(pt => pt.Id == Model.ParentTaskId);
+                    var currentParentVal = Model.ParentTaskId?.ToString() ?? "";
+                    var currentParentLabel = currentParent != null ? $"{currentParent.TaskNumber} - {currentParent.Title}" : "-- No Parent (Root Task) --";
+                }
+                <div class="relative" x-data="{ open: false, selectedVal: '@currentParentVal', selectedLabel: '@currentParentLabel' }">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Parent Task</label>
+                    <input type="hidden" name="ParentTaskId" :value="selectedVal" />
+                    
+                    <button type="button" 
+                            @@click="open = !open" 
+                            @@click.outside="open = false" 
+                            class="w-full flex items-center justify-between py-2.5 px-3.5 bg-white border border-slate-300 hover:border-sky-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none shadow-2xs transition text-left">
+                        <span x-text="selectedLabel" class="truncate"></span>
+                        <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <div x-show="open" 
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute left-0 mt-1.5 w-full rounded-2xl bg-white border border-slate-200 shadow-xl py-1.5 z-50 max-h-56 overflow-y-auto">
+                        <button type="button" 
+                                @@click="selectedVal = ''; selectedLabel = '-- No Parent (Root Task) --'; open = false" 
+                                class="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                                :class="selectedVal === '' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                            <span>-- No Parent (Root Task) --</span>
+                            <span x-show="selectedVal === ''" class="text-sky-600 font-bold">&check;</span>
+                        </button>
                         @foreach (var pt in Model.AvailableParentTasks)
                         {
-                            <option value="@pt.Id" selected="@(Model.ParentTaskId == pt.Id)">@pt.TaskNumber - @pt.Title</option>
+                            <button type="button" 
+                                    @@click="selectedVal = '@pt.Id'; selectedLabel = '@pt.TaskNumber - @pt.Title'; open = false" 
+                                    class="w-full flex items-center justify-between px-3.5 py-2.5 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                                    :class="selectedVal === '@pt.Id' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                                <span class="truncate">@pt.TaskNumber - @pt.Title</span>
+                                <span x-show="selectedVal === '@pt.Id'" class="text-sky-600 font-bold">&check;</span>
+                            </button>
                         }
-                    </select>
+                    </div>
                 </div>
             </div>
 
@@ -94,23 +228,23 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                     <label asp-for="EstimatedHours" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Estimate (Hours)</label>
-                    <input asp-for="EstimatedHours" type="number" step="0.5" min="0" class="w-full py-2.5 px-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs" />
+                    <input asp-for="EstimatedHours" type="number" step="0.5" min="0" class="w-full py-2.5 px-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none shadow-2xs" />
                 </div>
 
                 <div>
                     <label asp-for="StartedOn" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Start Date</label>
-                    <input asp-for="StartedOn" type="date" value="@(Model.StartedOn?.ToString("yyyy-MM-dd"))" class="w-full py-2.5 px-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs" />
+                    <input asp-for="StartedOn" type="date" value="@(Model.StartedOn?.ToString("yyyy-MM-dd"))" class="w-full py-2.5 px-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none shadow-2xs" />
                 </div>
 
                 <div>
                     <label asp-for="EndOn" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Target End Date</label>
-                    <input asp-for="EndOn" type="date" value="@(Model.EndOn?.ToString("yyyy-MM-dd"))" class="w-full py-2.5 px-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs" />
+                    <input asp-for="EndOn" type="date" value="@(Model.EndOn?.ToString("yyyy-MM-dd"))" class="w-full py-2.5 px-3.5 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none shadow-2xs" />
                 </div>
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
                 <a href="/Tasks/Details/@Model.Id" class="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 shadow-2xs transition">Cancel</a>
-                <button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+                <button type="submit" class="px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition">
                     Save Changes
                 </button>
             </div>

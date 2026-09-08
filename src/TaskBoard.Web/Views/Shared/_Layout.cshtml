@@ -16,17 +16,17 @@
                 extend: {
                     colors: {
                         brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            200: '#c7d2fe',
-                            300: '#a5b4fc',
-                            400: '#818cf8',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            800: '#3730a3',
-                            900: '#312e81',
-                            950: '#1e1b4b',
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                            950: '#082f49',
                         }
                     }
                 }
@@ -40,7 +40,7 @@
     <!-- Custom Light Theme Styles -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="h-full bg-slate-50 text-slate-900 flex overflow-hidden font-sans antialiased selection:bg-indigo-500 selection:text-white">
+<body class="h-full bg-slate-50 text-slate-900 flex overflow-hidden font-sans antialiased selection:bg-sky-500 selection:text-white">
 
     @if (CurrentUser.IsAuthenticated)
     {
@@ -57,18 +57,18 @@
             <nav class="flex-1 px-4 py-5 space-y-1.5 overflow-y-auto">
                 <div class="px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Core Workspace</div>
                 
-                <a href="/Dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Dashboard") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
-                    <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                <a href="/Dashboard" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Dashboard") ? "bg-sky-50 text-sky-700 border border-sky-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                    <svg class="w-4 h-4 shrink-0 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                     Dashboard
                 </a>
 
-                <a href="/Scrum" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Scrum") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
-                    <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
+                <a href="/Scrum" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Scrum") ? "bg-sky-50 text-sky-700 border border-sky-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                    <svg class="w-4 h-4 shrink-0 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
                     Scrum Board
                 </a>
 
-                <a href="/Tasks" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Tasks") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
-                    <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                <a href="/Tasks" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Tasks") ? "bg-sky-50 text-sky-700 border border-sky-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                    <svg class="w-4 h-4 shrink-0 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                     All Tasks
                 </a>
 
@@ -76,33 +76,33 @@
                 {
                     <div class="pt-5 px-3 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">Enterprise Administration</div>
 
-                    <a href="/Admin/Tenants" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Tenants") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
-                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    <a href="/Admin/Tenants" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Tenants") ? "bg-sky-50 text-sky-700 border border-sky-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                         Tenants
                     </a>
 
-                    <a href="/Admin/Users" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Users") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
-                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <a href="/Admin/Users" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Users") ? "bg-sky-50 text-sky-700 border border-sky-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                         Users & Roles
                     </a>
 
-                    <a href="/Admin/Statuses" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Statuses") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
-                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                    <a href="/Admin/Statuses" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Statuses") ? "bg-sky-50 text-sky-700 border border-sky-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
                         Statuses
                     </a>
 
-                    <a href="/Admin/Priorities" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Priorities") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
-                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <a href="/Admin/Priorities" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Priorities") ? "bg-sky-50 text-sky-700 border border-sky-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         Priorities
                     </a>
 
-                    <a href="/Admin/ScrumBoards" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/ScrumBoards") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
-                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+                    <a href="/Admin/ScrumBoards" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/ScrumBoards") ? "bg-sky-50 text-sky-700 border border-sky-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
                         Board Columns
                     </a>
 
-                    <a href="/Admin/Audit" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Audit") ? "bg-indigo-50 text-indigo-700 border border-indigo-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
-                        <svg class="w-4 h-4 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <a href="/Admin/Audit" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition @(Context.Request.Path.StartsWithSegments("/Admin/Audit") ? "bg-sky-50 text-sky-700 border border-sky-200/60 shadow-xs" : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80")">
+                        <svg class="w-4 h-4 shrink-0 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Audit Logs
                     </a>
                 }
@@ -113,7 +113,7 @@
                 <div class="relative">
                     <button type="button" @@click="userMenuOpen = !userMenuOpen" @@click.outside="userMenuOpen = false" class="w-full flex items-center justify-between p-2 rounded-xl hover:bg-white hover:shadow-xs border border-transparent hover:border-slate-200 transition text-left">
                         <div class="flex items-center gap-2.5 min-w-0">
-                            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center font-bold text-white text-xs shrink-0 uppercase shadow-xs">
+                            <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-600 to-cyan-600 flex items-center justify-center font-bold text-white text-xs shrink-0 uppercase shadow-xs">
                                 @(CurrentUser.FullName?.Substring(0, 1) ?? "U")
                             </div>
                             <div class="min-w-0">
@@ -139,7 +139,7 @@
                             <p class="text-xs font-bold text-slate-900 truncate">@CurrentUser.FullName</p>
                             <p class="text-[11px] text-slate-500 truncate">@CurrentUser.Email</p>
                             <div class="mt-1">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
                                     @CurrentUser.Role
                                 </span>
                             </div>
@@ -159,7 +159,7 @@
                 <!-- Bottom Sidebar Attribution -->
                 <div class="mt-2 pt-2 border-t border-slate-200/60 px-1 text-center">
                     <p class="text-[10px] font-bold text-slate-400 tracking-tight">
-                        Powered by <span class="text-indigo-600 font-extrabold">CodeArdra Solutions</span>
+                        Co-powered by <span class="text-sky-600 font-extrabold">CodeArdra Solutions</span>
                     </p>
                 </div>
             </div>
@@ -183,8 +183,8 @@
                     }
                     else if (!string.IsNullOrEmpty(TenantCtx.TenantCode))
                     {
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">
+                            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
                             Tenant: <span class="font-bold">@TenantCtx.TenantCode</span>
                         </span>
                     }
@@ -196,9 +196,9 @@
                             <button type="button" 
                                     @@click="tenantDropdownOpen = !tenantDropdownOpen" 
                                     @@click.outside="tenantDropdownOpen = false"
-                                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-indigo-300 text-xs font-semibold text-slate-700 shadow-xs transition">
-                                <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                                <span>Switch Tenant: <span class="text-indigo-600 font-bold">@(TenantCtx.TenantCode ?? "Select")</span></span>
+                                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-sky-300 text-xs font-semibold text-slate-700 shadow-xs transition">
+                                <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                                <span>Switch Tenant: <span class="text-sky-600 font-bold">@(TenantCtx.TenantCode ?? "Select")</span></span>
                                 <svg class="w-3.5 h-3.5 text-slate-400 transition-transform" :class="tenantDropdownOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
 
@@ -224,14 +224,14 @@
                                         <form asp-controller="TenantSwitcher" asp-action="Switch" method="post" class="block">
                                             <input type="hidden" name="tenantId" value="@tId" />
                                             <input type="hidden" name="returnUrl" value="@Context.Request.Path@Context.Request.QueryString" />
-                                            <button type="submit" class="w-full flex items-center justify-between px-3.5 py-2 text-xs font-semibold hover:bg-indigo-50/70 transition text-left @(isCurrent ? "text-indigo-600 font-bold bg-indigo-50/40" : "text-slate-700")">
+                                            <button type="submit" class="w-full flex items-center justify-between px-3.5 py-2 text-xs font-semibold hover:bg-sky-50/70 transition text-left @(isCurrent ? "text-sky-600 font-bold bg-sky-50/40" : "text-slate-700")">
                                                 <div class="flex items-center gap-2">
-                                                    <span class="w-2 h-2 rounded-full @(isCurrent ? "bg-indigo-600" : "bg-slate-300")"></span>
+                                                    <span class="w-2 h-2 rounded-full @(isCurrent ? "bg-sky-600" : "bg-slate-300")"></span>
                                                     <span>Tenant #@tId</span>
                                                 </div>
                                                 @if (isCurrent)
                                                 {
-                                                    <span class="text-[10px] font-bold text-indigo-600 bg-indigo-100/70 px-1.5 py-0.5 rounded">Active</span>
+                                                    <span class="text-[10px] font-bold text-sky-600 bg-sky-100/70 px-1.5 py-0.5 rounded">Active</span>
                                                 }
                                             </button>
                                         </form>
@@ -243,7 +243,7 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <a href="/Tasks/Create" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition transform active:scale-98">
+                    <a href="/Tasks/Create" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition transform active:scale-98">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         Create Task
                     </a>

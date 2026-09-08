@@ -11,7 +11,7 @@
         <a href="/Admin/Tenants" class="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 shadow-2xs transition">
             Manage Tenants
         </a>
-        <a href="/Admin/Users" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+        <a href="/Admin/Users" class="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition">
             Manage Users
         </a>
     </div>
@@ -22,7 +22,7 @@
     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
         <div class="flex items-center justify-between text-slate-500 mb-3">
             <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Tenants</span>
-            <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
             </div>
         </div>
@@ -51,7 +51,7 @@
             </div>
         </div>
         <div class="text-3xl font-black text-slate-900">@Model.TotalTasks</div>
-        <div class="text-[11px] text-indigo-600 mt-2 font-medium">Tracked across all Scrum boards</div>
+        <div class="text-[11px] text-sky-600 mt-2 font-medium">Tracked across all Scrum boards</div>
     </div>
 
     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
@@ -104,7 +104,7 @@
             <h3 class="text-base font-bold text-slate-900">Recently Created / Updated Tasks</h3>
             <p class="text-xs text-slate-500 mt-0.5">Live stream of tasks moving across tenant boards.</p>
         </div>
-        <a href="/Tasks" class="text-xs font-bold text-indigo-600 hover:text-indigo-700">View All Tasks &rarr;</a>
+        <a href="/Tasks" class="text-xs font-bold text-sky-600 hover:text-sky-700">View All Tasks &rarr;</a>
     </div>
 
     @if (Model.RecentTasks.Count == 0)
@@ -132,7 +132,7 @@
                     {
                         <tr class="hover:bg-slate-50/80 transition">
                             <td class="py-3.5 px-6 font-medium">
-                                <a href="/Tasks/Details/@task.Id" class="font-mono font-bold text-indigo-600 hover:underline mr-2">@task.TaskNumber</a>
+                                <a href="/Tasks/Details/@task.Id" class="font-mono font-bold text-sky-600 hover:underline mr-2">@task.TaskNumber</a>
                                 <span class="text-slate-800 font-medium">@task.Title</span>
                             </td>
                             <td class="py-3.5 px-6">

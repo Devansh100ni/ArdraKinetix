@@ -17,7 +17,7 @@
             <a href="/Scrum" class="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 shadow-2xs transition">
                 Scrum Board View &rarr;
             </a>
-            <a href="/Tasks/Create" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+            <a href="/Tasks/Create" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition">
                 + Create Task
             </a>
         </div>
@@ -33,47 +33,154 @@
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </span>
-                    <input type="text" name="Search" value="@Model.Criteria.Search" placeholder="Task number, title, description..." class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs" />
+                    <input type="text" name="Search" value="@Model.Criteria.Search" placeholder="Task number, title, description..." class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 focus:outline-none shadow-2xs" />
                 </div>
             </div>
 
             <!-- Tenant Filter (Admin / Dev) -->
             @if (Model.AvailableTenants.Count > 0)
             {
-                <div>
+                var currentT = Model.AvailableTenants.FirstOrDefault(t => t.Id == Model.Criteria.TenantId);
+                var currentTLabel = currentT != null ? $"{currentT.Name} ({currentT.Code})" : "All Authorized Tenants";
+
+                <div class="relative" x-data="{ open: false, selectedVal: '@(Model.Criteria.TenantId?.ToString() ?? "")', selectedLabel: '@currentTLabel' }">
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Tenant</label>
-                    <select name="TenantId" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs">
-                        <option value="">All Authorized Tenants</option>
+                    <input type="hidden" name="TenantId" :value="selectedVal" />
+                    
+                    <button type="button" 
+                            @@click="open = !open" 
+                            @@click.outside="open = false" 
+                            class="w-full flex items-center justify-between gap-2 py-2 px-3 bg-white border border-slate-300 hover:border-sky-300 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none shadow-2xs transition text-left">
+                        <span x-text="selectedLabel" class="truncate"></span>
+                        <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <div x-show="open" 
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute left-0 mt-1.5 w-full min-w-[200px] rounded-2xl bg-white border border-slate-200 shadow-xl py-1.5 z-50 max-h-56 overflow-y-auto">
+                        <button type="button" 
+                                @@click="selectedVal = ''; selectedLabel = 'All Authorized Tenants'; open = false" 
+                                class="w-full flex items-center justify-between px-3.5 py-2 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                                :class="selectedVal === '' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                            <span>All Authorized Tenants</span>
+                            <span x-show="selectedVal === ''" class="text-sky-600 font-bold">&check;</span>
+                        </button>
                         @foreach (var t in Model.AvailableTenants)
                         {
-                            <option value="@t.Id" selected="@(Model.Criteria.TenantId == t.Id)">@t.Name (@t.Code)</option>
+                            <button type="button" 
+                                    @@click="selectedVal = '@t.Id'; selectedLabel = '@t.Name (@t.Code)'; open = false" 
+                                    class="w-full flex items-center justify-between px-3.5 py-2 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                                    :class="selectedVal === '@t.Id' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                                <span class="truncate">@t.Name (@t.Code)</span>
+                                <span x-show="selectedVal === '@t.Id'" class="text-sky-600 font-bold">&check;</span>
+                            </button>
                         }
-                    </select>
+                    </div>
                 </div>
             }
 
             <!-- Status Filter -->
-            <div>
+            @{
+                var currentS = Model.AvailableStatuses.FirstOrDefault(s => s.Id == Model.Criteria.StatusId);
+                var currentSLabel = currentS != null ? currentS.Name : "All Statuses";
+            }
+            <div class="relative" x-data="{ open: false, selectedVal: '@(Model.Criteria.StatusId?.ToString() ?? "")', selectedLabel: '@currentSLabel' }">
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Status</label>
-                <select name="StatusId" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs">
-                    <option value="">All Statuses</option>
+                <input type="hidden" name="StatusId" :value="selectedVal" />
+                
+                <button type="button" 
+                        @@click="open = !open" 
+                        @@click.outside="open = false" 
+                        class="w-full flex items-center justify-between gap-2 py-2 px-3 bg-white border border-slate-300 hover:border-sky-300 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none shadow-2xs transition text-left">
+                    <span x-text="selectedLabel" class="truncate"></span>
+                    <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+
+                <div x-show="open" 
+                     x-cloak
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="absolute left-0 mt-1.5 w-full min-w-[180px] rounded-2xl bg-white border border-slate-200 shadow-xl py-1.5 z-50 max-h-56 overflow-y-auto">
+                    <button type="button" 
+                            @@click="selectedVal = ''; selectedLabel = 'All Statuses'; open = false" 
+                            class="w-full flex items-center justify-between px-3.5 py-2 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                            :class="selectedVal === '' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                        <span>All Statuses</span>
+                        <span x-show="selectedVal === ''" class="text-sky-600 font-bold">&check;</span>
+                    </button>
                     @foreach (var s in Model.AvailableStatuses)
                     {
-                        <option value="@s.Id" selected="@(Model.Criteria.StatusId == s.Id)">@s.Name</option>
+                        <button type="button" 
+                                @@click="selectedVal = '@s.Id'; selectedLabel = '@s.Name'; open = false" 
+                                class="w-full flex items-center justify-between px-3.5 py-2 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                                :class="selectedVal === '@s.Id' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                            <div class="flex items-center gap-2 truncate">
+                                <span class="w-2 h-2 rounded-full" style="background-color: @s.Color;"></span>
+                                <span class="truncate">@s.Name</span>
+                            </div>
+                            <span x-show="selectedVal === '@s.Id'" class="text-sky-600 font-bold">&check;</span>
+                        </button>
                     }
-                </select>
+                </div>
             </div>
 
             <!-- Priority Filter -->
-            <div>
+            @{
+                var currentP = Model.AvailablePriorities.FirstOrDefault(p => p.Id == Model.Criteria.PriorityId);
+                var currentPLabel = currentP != null ? currentP.Name : "All Priorities";
+            }
+            <div class="relative" x-data="{ open: false, selectedVal: '@(Model.Criteria.PriorityId?.ToString() ?? "")', selectedLabel: '@currentPLabel' }">
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Priority</label>
-                <select name="PriorityId" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none shadow-2xs">
-                    <option value="">All Priorities</option>
+                <input type="hidden" name="PriorityId" :value="selectedVal" />
+                
+                <button type="button" 
+                        @@click="open = !open" 
+                        @@click.outside="open = false" 
+                        class="w-full flex items-center justify-between gap-2 py-2 px-3 bg-white border border-slate-300 hover:border-sky-300 rounded-xl text-xs font-medium text-slate-800 focus:ring-2 focus:ring-sky-500 focus:outline-none shadow-2xs transition text-left">
+                    <span x-text="selectedLabel" class="truncate"></span>
+                    <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+
+                <div x-show="open" 
+                     x-cloak
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="absolute left-0 mt-1.5 w-full min-w-[180px] rounded-2xl bg-white border border-slate-200 shadow-xl py-1.5 z-50 max-h-56 overflow-y-auto">
+                    <button type="button" 
+                            @@click="selectedVal = ''; selectedLabel = 'All Priorities'; open = false" 
+                            class="w-full flex items-center justify-between px-3.5 py-2 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                            :class="selectedVal === '' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                        <span>All Priorities</span>
+                        <span x-show="selectedVal === ''" class="text-sky-600 font-bold">&check;</span>
+                    </button>
                     @foreach (var p in Model.AvailablePriorities)
                     {
-                        <option value="@p.Id" selected="@(Model.Criteria.PriorityId == p.Id)">@p.Name</option>
+                        <button type="button" 
+                                @@click="selectedVal = '@p.Id'; selectedLabel = '@p.Name'; open = false" 
+                                class="w-full flex items-center justify-between px-3.5 py-2 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                                :class="selectedVal === '@p.Id' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                            <div class="flex items-center gap-2 truncate">
+                                <span class="w-2 h-2 rounded-full" style="background-color: @p.Color;"></span>
+                                <span class="truncate">@p.Name</span>
+                            </div>
+                            <span x-show="selectedVal === '@p.Id'" class="text-sky-600 font-bold">&check;</span>
+                        </button>
                     }
-                </select>
+                </div>
             </div>
 
             <!-- Actions -->
@@ -81,7 +188,7 @@
                 <a href="/Tasks" class="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold border border-slate-200 shadow-2xs transition">
                     Reset
                 </a>
-                <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition">
+                <button type="submit" class="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition">
                     Apply Filters
                 </button>
             </div>
@@ -117,11 +224,11 @@
                         @foreach (var task in Model.Tasks.Items)
                         {
                             <tr class="hover:bg-slate-50/80 transition group">
-                                <td class="py-3.5 px-6 font-mono font-bold text-indigo-600">
+                                <td class="py-3.5 px-6 font-mono font-bold text-sky-600">
                                     <a href="/Tasks/Details/@task.Id" class="hover:underline">@task.TaskNumber</a>
                                 </td>
                                 <td class="py-3.5 px-6 font-semibold text-slate-900">
-                                    <a href="/Tasks/Details/@task.Id" class="hover:text-indigo-600 transition">
+                                    <a href="/Tasks/Details/@task.Id" class="hover:text-sky-600 transition">
                                         @task.Title
                                     </a>
                                     @if (!string.IsNullOrEmpty(task.ParentTaskNumber))

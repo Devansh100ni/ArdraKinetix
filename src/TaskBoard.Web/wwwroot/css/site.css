@@ -1,9 +1,12 @@
-/* ArdraKinetix - Enterprise Agile & Scrum Design System (Light Theme) */
+/* ArdraKinetix - Enterprise Agile & Scrum Design System (Light Theme - Logo Color Palette) */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
+  --primary: #0284c7;
+  --primary-hover: #0369a1;
+  --primary-dark: #004b87;
+  --accent-emerald: #10b981;
+  --accent-cyan: #06b6d4;
   --bg-canvas: #f8fafc;
   --card-bg: #ffffff;
   --card-border: #e2e8f0;
@@ -52,22 +55,22 @@ font-mono, [class*="font-mono"] {
 }
 
 .glass-card:hover {
-  border-color: #a5b4fc;
+  border-color: #7dd3fc;
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 20px -5px rgba(2, 132, 199, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
 }
 
 /* Drag and Drop visual feedback for Scrum Board */
 .dragging {
   opacity: 0.5;
   transform: scale(0.98);
-  box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.2);
-  border: 2px dashed #6366f1 !important;
+  box-shadow: 0 20px 25px -5px rgba(2, 132, 199, 0.2);
+  border: 2px dashed #0284c7 !important;
 }
 
 .drop-target-active {
-  background-color: #eef2ff !important;
-  border: 2px dashed #4f46e5 !important;
+  background-color: #f0f9ff !important;
+  border: 2px dashed #0369a1 !important;
 }
 
 /* Toast animations */

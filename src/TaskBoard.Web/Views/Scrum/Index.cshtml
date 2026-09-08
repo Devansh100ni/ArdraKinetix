@@ -13,7 +13,7 @@
                 <h2 class="text-2xl font-black text-slate-900 tracking-tight">Agile Scrum Board</h2>
                 @if (!string.IsNullOrEmpty(Model.SelectedTenantName))
                 {
-                    <span class="px-2.5 py-0.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 font-mono text-xs font-bold">
+                    <span class="px-2.5 py-0.5 rounded-lg bg-sky-50 border border-sky-200 text-sky-700 font-mono text-xs font-bold">
                         @Model.SelectedTenantName
                     </span>
                 }
@@ -24,18 +24,58 @@
         <div class="flex items-center gap-3">
             @if (Model.AvailableTenants.Count > 0)
             {
-                <form method="get" asp-action="Index" class="flex items-center gap-2">
-                    <select name="tenantId" onchange="this.form.submit()" class="bg-white border border-slate-300 text-xs font-semibold text-slate-700 rounded-xl px-3 py-2 shadow-2xs focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
-                        <option value="">-- Switch Tenant Board --</option>
-                        @foreach (var t in Model.AvailableTenants)
-                        {
-                            <option value="@t.Id" selected="@(Model.SelectedTenantId == t.Id)">@t.Name (@t.Code)</option>
-                        }
-                    </select>
-                </form>
+                var currentTenant = Model.AvailableTenants.FirstOrDefault(t => t.Id == Model.SelectedTenantId);
+                var currentTenantLabel = currentTenant != null ? $"{currentTenant.Name} ({currentTenant.Code})" : "Switch Tenant Board";
+
+                <div class="relative" x-data="{ open: false, selectedLabel: '@currentTenantLabel' }">
+                    <button type="button" 
+                            @@click="open = !open" 
+                            @@click.outside="open = false" 
+                            class="inline-flex items-center justify-between gap-2.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:border-sky-300 text-xs font-semibold text-slate-700 shadow-2xs transition min-w-[210px]">
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="w-2 h-2 rounded-full @(currentTenant != null ? "bg-sky-500" : "bg-slate-300")"></span>
+                            <span x-text="selectedLabel" class="truncate font-bold text-slate-800"></span>
+                        </div>
+                        <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <!-- Tailwind Dropdown Menu -->
+                    <div x-show="open" 
+                         x-cloak
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute right-0 mt-1.5 w-64 rounded-2xl bg-white border border-slate-200 shadow-xl py-2 z-50">
+                        <div class="px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 flex items-center justify-between">
+                            <span>Available Tenants</span>
+                            <span class="font-mono text-slate-500 font-bold">@Model.AvailableTenants.Count</span>
+                        </div>
+                        <div class="py-1 max-h-60 overflow-y-auto">
+                            @foreach (var t in Model.AvailableTenants)
+                            {
+                                var isSelected = Model.SelectedTenantId == t.Id;
+                                <a href="?tenantId=@t.Id" 
+                                   class="w-full flex items-center justify-between px-3.5 py-2 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition @(isSelected ? "bg-sky-50/80 text-sky-700 font-bold" : "text-slate-700")">
+                                    <div class="flex items-center gap-2 truncate">
+                                        <span class="w-2 h-2 rounded-full @(isSelected ? "bg-sky-500" : "bg-slate-300")"></span>
+                                        <span class="truncate">@t.Name</span>
+                                        <span class="font-mono text-[10px] text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">@t.Code</span>
+                                    </div>
+                                    @if (isSelected)
+                                    {
+                                        <svg class="w-4 h-4 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    }
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
             }
 
-            <a href="/Tasks/Create@(Model.SelectedTenantId.HasValue ? $"?tenantId={Model.SelectedTenantId.Value}" : "")" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-500/20 transition flex items-center gap-2">
+            <a href="/Tasks/Create@(Model.SelectedTenantId.HasValue ? $"?tenantId={Model.SelectedTenantId.Value}" : "")" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 Add Task
             </a>
@@ -77,7 +117,7 @@
                                 </span>
                             }
 
-                            <span class="column-task-count px-2 py-0.5 rounded-full bg-white text-[11px] font-bold text-indigo-600 border border-slate-200 shadow-2xs">
+                            <span class="column-task-count px-2 py-0.5 rounded-full bg-white text-[11px] font-bold text-sky-600 border border-slate-200 shadow-2xs">
                                 @column.Tasks.Count
                             </span>
                         </div>

@@ -1,13 +1,13 @@
 @model TaskDto
 
-<div class="scrum-task-card bg-white p-4 rounded-2xl cursor-grab active:cursor-grabbing border border-slate-200 shadow-2xs hover:shadow-md hover:border-indigo-300 group relative transition-all"
+<div class="scrum-task-card bg-white p-4 rounded-2xl cursor-grab active:cursor-grabbing border border-slate-200 shadow-2xs hover:shadow-md hover:border-sky-300 group relative transition-all"
      data-task-id="@Model.Id"
      data-status-id="@Model.StatusId"
      data-row-version="@(Model.RowVersion != null ? Convert.ToBase64String(Model.RowVersion) : "")">
 
     <!-- Card Header: Number & Priority -->
     <div class="flex items-center justify-between gap-2 mb-2">
-        <a href="/Tasks/Details/@Model.Id" class="task-number font-mono text-xs font-bold text-indigo-600 hover:text-indigo-700 hover:underline">
+        <a href="/Tasks/Details/@Model.Id" class="task-number font-mono text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline">
             @Model.TaskNumber
         </a>
 
@@ -18,7 +18,7 @@
     </div>
 
     <!-- Title -->
-    <a href="/Tasks/Details/@Model.Id" class="block text-xs font-bold text-slate-900 group-hover:text-indigo-600 line-clamp-2 mb-2 transition leading-snug">
+    <a href="/Tasks/Details/@Model.Id" class="block text-xs font-bold text-slate-900 group-hover:text-sky-600 line-clamp-2 mb-2 transition leading-snug">
         @Model.Title
     </a>
 
@@ -55,7 +55,7 @@
             @if (!string.IsNullOrWhiteSpace(Model.AssignedUserName))
             {
                 <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 font-semibold text-[10px]" title="Assigned to @Model.AssignedUserName">
-                    <span class="w-3.5 h-3.5 rounded-full bg-indigo-600 text-[9px] text-white flex items-center justify-center font-bold uppercase">
+                    <span class="w-3.5 h-3.5 rounded-full bg-sky-600 text-[9px] text-white flex items-center justify-center font-bold uppercase">
                         @Model.AssignedUserName.Substring(0, 1)
                     </span>
                     <span class="truncate max-w-[80px]">@Model.AssignedUserName</span>

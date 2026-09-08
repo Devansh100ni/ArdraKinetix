@@ -35,7 +35,7 @@
                                     <span class="truncate">@col.Name</span>
                                     <span class="font-mono text-slate-500">#@col.DisplayOrder</span>
                                 </div>
-                                <div class="text-[11px] text-slate-600">Status: <span class="text-indigo-600 font-bold">@col.StatusName</span></div>
+                                <div class="text-[11px] text-slate-600">Status: <span class="text-sky-600 font-bold">@col.StatusName</span></div>
                                 <div class="text-[11px] text-slate-600">WIP Limit: <span class="text-amber-700 font-bold">@(col.WipLimit.HasValue ? col.WipLimit.Value.ToString() : "None")</span></div>
                             </div>
 
@@ -57,27 +57,61 @@
                     <input type="hidden" name="boardId" value="@board.Id" />
                     <div>
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Column Name *</label>
-                        <input type="text" name="Name" required placeholder="e.g. QA Review" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs" />
+                        <input type="text" name="Name" required placeholder="e.g. QA Review" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-2xs" />
                     </div>
-                    <div>
+
+                    @{
+                        var defaultStat = statuses.FirstOrDefault();
+                        var defaultStatVal = defaultStat?.Id.ToString() ?? "";
+                        var defaultStatLabel = defaultStat?.Name ?? "Select Status";
+                    }
+                    <div class="relative" x-data="{ open: false, selectedVal: '@defaultStatVal', selectedLabel: '@defaultStatLabel' }">
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Mapped Status *</label>
-                        <select name="StatusId" required class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs">
+                        <input type="hidden" name="StatusId" :value="selectedVal" required />
+                        
+                        <button type="button" 
+                                @@click="open = !open" 
+                                @@click.outside="open = false" 
+                                class="w-full flex items-center justify-between gap-2 py-2 px-3 bg-white border border-slate-300 hover:border-sky-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-2xs transition text-left">
+                            <span x-text="selectedLabel" class="truncate"></span>
+                            <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200" :class="open ? 'rotate-180 text-sky-600' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+
+                        <div x-show="open" 
+                             x-cloak
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="absolute left-0 mt-1.5 w-full rounded-2xl bg-white border border-slate-200 shadow-xl py-1.5 z-50 max-h-56 overflow-y-auto">
                             @foreach (var s in statuses)
                             {
-                                <option value="@s.Id">@s.Name</option>
+                                <button type="button" 
+                                        @@click="selectedVal = '@s.Id'; selectedLabel = '@s.Name'; open = false" 
+                                        class="w-full flex items-center justify-between px-3.5 py-2 text-xs font-medium hover:bg-sky-50 hover:text-sky-700 transition"
+                                        :class="selectedVal === '@s.Id' ? 'bg-sky-50/80 text-sky-700 font-bold' : 'text-slate-700'">
+                                    <div class="flex items-center gap-2 truncate">
+                                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: @s.Color;"></span>
+                                        <span class="truncate">@s.Name</span>
+                                    </div>
+                                    <span x-show="selectedVal === '@s.Id'" class="text-sky-600 font-bold">&check;</span>
+                                </button>
                             }
-                        </select>
+                        </div>
                     </div>
+
                     <div>
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">Display Order *</label>
-                        <input type="number" name="DisplayOrder" value="@(board.Columns.Count + 1)" min="1" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs" />
+                        <input type="number" name="DisplayOrder" value="@(board.Columns.Count + 1)" min="1" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-2xs" />
                     </div>
                     <div>
                         <label class="block text-[11px] font-bold text-slate-700 mb-1">WIP Limit (Optional)</label>
-                        <input type="number" name="WipLimit" min="1" placeholder="e.g. 5" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs" />
+                        <input type="number" name="WipLimit" min="1" placeholder="e.g. 5" class="w-full py-2 px-3 bg-white border border-slate-300 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-2xs" />
                     </div>
                     <div>
-                        <button type="submit" class="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-500/20 transition">
+                        <button type="submit" class="w-full py-2 px-4 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-md shadow-sky-500/20 transition">
                             + Add Column
                         </button>
                     </div>

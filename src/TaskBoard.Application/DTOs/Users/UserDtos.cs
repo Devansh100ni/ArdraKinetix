@@ -11,6 +11,11 @@ public class UserDto
     public string Email { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
     public bool IsActive { get; set; }
+    public bool IsLockedOut { get; set; }
+    public DateTime? LockoutEndUtc { get; set; }
+    public int FailedLoginAttempts { get; set; }
+    public string? LockoutReason { get; set; }
+    public bool MustChangePassword { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime? LastLoginOn { get; set; }
     public IReadOnlyList<string> Roles { get; set; } = [];

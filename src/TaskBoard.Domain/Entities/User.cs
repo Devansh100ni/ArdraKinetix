@@ -12,6 +12,14 @@ public class User : AuditableEntity, ISoftDeletable
     public bool IsActive { get; set; } = true;
     public DateTime? LastLoginOn { get; set; }
 
+    // Security & Lockout
+    public bool IsLockedOut { get; set; }
+    public DateTime? LockoutEndUtc { get; set; }
+    public int FailedLoginAttempts { get; set; }
+    public string? LockoutReason { get; set; }
+    public bool MustChangePassword { get; set; }
+    public string SecurityStamp { get; set; } = Guid.NewGuid().ToString();
+
     public string FullName => string.IsNullOrWhiteSpace(LastName) 
         ? FirstName 
         : $"{FirstName} {LastName}".Trim();
@@ -28,4 +36,6 @@ public class User : AuditableEntity, ISoftDeletable
     public virtual ICollection<TaskComment> Comments { get; set; } = new List<TaskComment>();
     public virtual ICollection<TaskAttachment> Attachments { get; set; } = new List<TaskAttachment>();
     public virtual ICollection<TaskAudit> Audits { get; set; } = new List<TaskAudit>();
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

@@ -20,6 +20,7 @@ public class AuthenticationServiceTests
     private readonly Mock<IPasswordHasherService> _hasherMock = new();
     private readonly Mock<IJwtTokenService> _jwtMock = new();
     private readonly Mock<IAdminAuditRepository> _auditRepoMock = new();
+    private readonly Mock<IRefreshTokenService> _refreshTokenMock = new();
     private readonly Mock<ICurrentUserService> _currentUserMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
@@ -33,7 +34,7 @@ public class AuthenticationServiceTests
         {
             Id = Guid.NewGuid(),
             Username = "devuser",
-            Email = "dev@example.com",
+            Email = "dev@taskboard.local",
             PasswordHash = "HASH",
             IsActive = true
         };
@@ -52,10 +53,14 @@ public class AuthenticationServiceTests
         _jwtMock.Setup(j => j.GenerateToken(user, SystemRoles.Developer, tenant1, It.Is<IReadOnlyList<Guid>>(l => l.Count == 2)))
             .Returns("JWT_DEV_TOKEN");
 
+        _refreshTokenMock.Setup(r => r.GenerateRefreshTokenAsync(user.Id, It.IsAny<string?>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new RefreshToken { Token = "SAMPLE_REFRESH_TOKEN", UserId = user.Id, ExpiresUtc = DateTime.UtcNow.AddDays(5) });
+
         var service = new AuthenticationService(
             _userRepoMock.Object,
             _hasherMock.Object,
             _jwtMock.Object,
+            _refreshTokenMock.Object,
             _currentUserMock.Object,
             _unitOfWorkMock.Object,
             NullLogger<AuthenticationService>.Instance);

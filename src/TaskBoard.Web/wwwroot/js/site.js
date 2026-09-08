@@ -90,6 +90,26 @@ window.TaskBoard = {
     }
 };
 
+// Global alias for showToast
+window.showToast = function(title, message, type) {
+    window.TaskBoard.showToast(`${title ? '<strong>' + title + '</strong>: ' : ''}${message}`, type || 'info');
+};
+
+// Clean empty fields from GET forms before submission to ensure clean, encoded URL bars
+document.addEventListener('submit', function (e) {
+    const form = e.target;
+    if (form && form.method && form.method.toLowerCase() === 'get') {
+        const inputs = form.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            if (input.name && (!input.value || input.value.trim() === '')) {
+                input.disabled = true;
+                // Re-enable after short delay in case user navigates back
+                setTimeout(() => { input.disabled = false; }, 1000);
+            }
+        });
+    }
+});
+
 // Global click-outside listener for vanilla dropdown fallbacks
 document.addEventListener('click', function (e) {
     document.querySelectorAll('[data-dropdown-menu]').forEach(menu => {

@@ -25,6 +25,8 @@ public class TaskServiceTests
     private readonly Mock<ICurrentUserService> _currentUserMock = new();
     private readonly Mock<ITaskNumberGenerator> _taskNumberGenMock = new();
     private readonly Mock<IFileStorageService> _fileStorageMock = new();
+    private readonly Mock<IRealtimeNotificationService> _realtimeMock = new();
+    private readonly Mock<TaskBoard.Application.Features.Notifications.INotificationService> _notificationMock = new();
     private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
     private TaskService CreateService()
@@ -40,6 +42,8 @@ public class TaskServiceTests
             _currentUserMock.Object,
             _taskNumberGenMock.Object,
             _fileStorageMock.Object,
+            _realtimeMock.Object,
+            _notificationMock.Object,
             _unitOfWorkMock.Object,
             NullLogger<TaskService>.Instance);
     }

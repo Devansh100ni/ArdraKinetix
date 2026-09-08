@@ -29,6 +29,8 @@ public class TaskService : ITaskService
     private readonly ICurrentUserService _currentUserService;
     private readonly ITaskNumberGenerator _taskNumberGenerator;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IRealtimeNotificationService _realtimeService;
+    private readonly TaskBoard.Application.Features.Notifications.INotificationService _notificationService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<TaskService> _logger;
 
@@ -43,6 +45,8 @@ public class TaskService : ITaskService
         ICurrentUserService currentUserService,
         ITaskNumberGenerator taskNumberGenerator,
         IFileStorageService fileStorageService,
+        IRealtimeNotificationService realtimeService,
+        TaskBoard.Application.Features.Notifications.INotificationService notificationService,
         IUnitOfWork unitOfWork,
         ILogger<TaskService> logger)
     {
@@ -56,6 +60,8 @@ public class TaskService : ITaskService
         _currentUserService = currentUserService;
         _taskNumberGenerator = taskNumberGenerator;
         _fileStorageService = fileStorageService;
+        _realtimeService = realtimeService;
+        _notificationService = notificationService;
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
@@ -203,6 +209,19 @@ public class TaskService : ITaskService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Task {TaskNumber} ({TaskId}) created for tenant {TenantId}.", task.TaskNumber, task.Id, task.TenantId);
 
+        // Notify assigned user
+        if (task.AssignedUserId.HasValue && task.AssignedUserId != currentUserId)
+        {
+            await _notificationService.CreateNotificationAsync(
+                task.AssignedUserId.Value,
+                task.TenantId,
+                "New Task Assigned",
+                $"You have been assigned to task {task.TaskNumber}: {task.Title}",
+                "TaskAssigned",
+                $"/Tasks/Details/{task.Id}",
+                cancellationToken);
+        }
+
         var loaded = await _taskRepository.GetByIdWithDetailsAsync(task.Id, cancellationToken);
         return Result<TaskDetailDto>.Success(MapToDetailDto(loaded ?? task, currentUserId));
     }
@@ -333,6 +352,19 @@ public class TaskService : ITaskService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Task {TaskId} updated successfully.", task.Id);
 
+        // Notify new assignee if changed
+        if (dto.AssignedUserId.HasValue && dto.AssignedUserId != currentUserId && audits.Any(a => a.FieldName == "AssignedUser"))
+        {
+            await _notificationService.CreateNotificationAsync(
+                dto.AssignedUserId.Value,
+                task.TenantId,
+                "Task Reassigned",
+                $"You have been assigned to task {task.TaskNumber}: {task.Title}",
+                "TaskAssigned",
+                $"/Tasks/Details/{task.Id}",
+                cancellationToken);
+        }
+
         var updated = await _taskRepository.GetByIdWithDetailsAsync(task.Id, cancellationToken);
         return Result<TaskDetailDto>.Success(MapToDetailDto(updated ?? task, currentUserId));
     }
@@ -384,6 +416,30 @@ public class TaskService : ITaskService
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         _logger.LogInformation("Task {TaskNumber} moved from {OldStatus} to {NewStatus}.", task.TaskNumber, oldStatusName, targetStatus.Name);
+
+        // Broadcast real-time Scrum board update across all connected clients
+        await _realtimeService.SendTaskMovedAsync(
+            task.TenantId,
+            task.Id,
+            task.TaskNumber,
+            targetStatus.Id,
+            oldStatusName,
+            targetStatus.Name,
+            _currentUserService.Username ?? "User",
+            cancellationToken);
+
+        // Notify assigned user if task was moved by someone else
+        if (task.AssignedUserId.HasValue && task.AssignedUserId.Value != _currentUserService.UserId)
+        {
+            await _notificationService.CreateNotificationAsync(
+                task.AssignedUserId.Value,
+                task.TenantId,
+                $"Task Status Updated: {task.TaskNumber}",
+                $"{_currentUserService.FullName ?? _currentUserService.Username ?? "A team member"} moved task {task.TaskNumber} ('{task.Title}') from {oldStatusName} to {targetStatus.Name}.",
+                "TaskMoved",
+                $"/Tasks/Details/{task.Id}",
+                cancellationToken);
+        }
 
         var refreshed = await _taskRepository.GetByIdWithDetailsAsync(task.Id, cancellationToken);
         return Result<TaskDto>.Success(MapToDto(refreshed ?? task));
@@ -470,6 +526,22 @@ public class TaskService : ITaskService
         await _taskAuditRepository.AddAsync(audit, cancellationToken);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // Notify assigned user if someone else commented on their task
+        if (task.AssignedUserId.HasValue && task.AssignedUserId != currentUserId)
+        {
+            var commentSnippet = dto.Comment.Trim();
+            if (commentSnippet.Length > 60) commentSnippet = commentSnippet.Substring(0, 57) + "...";
+
+            await _notificationService.CreateNotificationAsync(
+                task.AssignedUserId.Value,
+                task.TenantId,
+                $"New Comment on {task.TaskNumber}",
+                $"{_currentUserService.FullName ?? _currentUserService.Username ?? "A user"} commented: \"{commentSnippet}\"",
+                "TaskComment",
+                $"/Tasks/Details/{task.Id}",
+                cancellationToken);
+        }
 
         var commentDto = new TaskCommentDto
         {

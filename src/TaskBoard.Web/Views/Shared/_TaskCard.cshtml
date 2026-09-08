@@ -2,6 +2,7 @@
 
 <div class="scrum-task-card bg-white p-4 rounded-2xl cursor-grab active:cursor-grabbing border border-slate-200 shadow-2xs hover:shadow-md hover:border-sky-300 group relative transition-all"
      data-task-id="@Model.Id"
+     data-task-number="@Model.TaskNumber"
      data-status-id="@Model.StatusId"
      data-row-version="@(Model.RowVersion != null ? Convert.ToBase64String(Model.RowVersion) : "")">
 

@@ -43,11 +43,11 @@ public class TaskDto
 
 public class TaskDetailDto : TaskDto
 {
-    public TenantDto Tenant { get; set; } = null!;
+    public TenantDto? Tenant { get; set; }
     public UserDto? AssignedUser { get; set; }
     public UserDto? Creator { get; set; }
-    public TaskStatusDto Status { get; set; } = null!;
-    public TaskPriorityDto Priority { get; set; } = null!;
+    public TaskStatusDto? Status { get; set; }
+    public TaskPriorityDto? Priority { get; set; }
     public TaskDto? ParentTask { get; set; }
     public IReadOnlyList<TaskDto> ChildTasks { get; set; } = [];
     public IReadOnlyList<TaskCommentDto> Comments { get; set; } = [];

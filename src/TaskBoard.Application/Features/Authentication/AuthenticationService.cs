@@ -13,6 +13,7 @@ public class AuthenticationService : IAuthenticationService
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasherService _passwordHasher;
     private readonly IJwtTokenService _jwtTokenService;
+    private readonly IRefreshTokenService _refreshTokenService;
     private readonly ICurrentUserService _currentUserService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<AuthenticationService> _logger;
@@ -21,6 +22,7 @@ public class AuthenticationService : IAuthenticationService
         IUserRepository userRepository,
         IPasswordHasherService passwordHasher,
         IJwtTokenService jwtTokenService,
+        IRefreshTokenService refreshTokenService,
         ICurrentUserService currentUserService,
         IUnitOfWork unitOfWork,
         ILogger<AuthenticationService> logger)
@@ -28,6 +30,7 @@ public class AuthenticationService : IAuthenticationService
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
         _jwtTokenService = jwtTokenService;
+        _refreshTokenService = refreshTokenService;
         _currentUserService = currentUserService;
         _unitOfWork = unitOfWork;
         _logger = logger;
@@ -53,11 +56,87 @@ public class AuthenticationService : IAuthenticationService
             return new LoginResponse { Success = false, Error = "This account is inactive. Please contact your system administrator." };
         }
 
+        // Check if user is currently locked out
+        if (user.IsLockedOut)
+        {
+            if (user.LockoutEndUtc.HasValue && user.LockoutEndUtc.Value > DateTime.UtcNow)
+            {
+                var remainingMinutes = (int)Math.Ceiling((user.LockoutEndUtc.Value - DateTime.UtcNow).TotalMinutes);
+                _logger.LogWarning("Login attempt for locked out user: {UserId}. Remaining: {RemainingMinutes} mins", user.Id, remainingMinutes);
+                return new LoginResponse
+                {
+                    Success = false,
+                    IsLockedOut = true,
+                    LockoutMinutesRemaining = remainingMinutes,
+                    Error = $"Account is locked due to multiple failed login attempts ({user.LockoutReason ?? "Security policy"}). Please try again in {remainingMinutes} minute(s) or contact an administrator."
+                };
+            }
+            else if (user.LockoutEndUtc.HasValue && user.LockoutEndUtc.Value <= DateTime.UtcNow)
+            {
+                // Lockout expired, automatically unlock
+                user.IsLockedOut = false;
+                user.LockoutEndUtc = null;
+                user.FailedLoginAttempts = 0;
+                user.LockoutReason = null;
+            }
+            else
+            {
+                // Permanent administrative lock
+                _logger.LogWarning("Login attempt for administratively locked user: {UserId}", user.Id);
+                return new LoginResponse
+                {
+                    Success = false,
+                    IsLockedOut = true,
+                    Error = $"Account is locked by an administrator ({user.LockoutReason ?? "Administrative lock"}). Please contact support."
+                };
+            }
+        }
+
         bool isPasswordValid = _passwordHasher.VerifyPassword(user, user.PasswordHash, request.Password);
         if (!isPasswordValid)
         {
-            _logger.LogWarning("Invalid password for user: {UserId}", user.Id);
-            return new LoginResponse { Success = false, Error = "Invalid email/username or password." };
+            user.FailedLoginAttempts++;
+            if (user.FailedLoginAttempts >= 5)
+            {
+                user.IsLockedOut = true;
+                user.LockoutEndUtc = DateTime.UtcNow.AddMinutes(30);
+                user.LockoutReason = "5 consecutive invalid password attempts";
+                _logger.LogWarning("User {UserId} locked out for 30 mins after {Attempts} failed attempts.", user.Id, user.FailedLoginAttempts);
+
+                _userRepository.Update(user);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                return new LoginResponse
+                {
+                    Success = false,
+                    IsLockedOut = true,
+                    LockoutMinutesRemaining = 30,
+                    Error = "Account has been locked for 30 minutes due to 5 consecutive failed password attempts. Please try again later or contact your administrator."
+                };
+            }
+
+            _userRepository.Update(user);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            int remainingAttempts = 5 - user.FailedLoginAttempts;
+            _logger.LogWarning("Invalid password for user: {UserId}. Attempt {Attempts} of 5", user.Id, user.FailedLoginAttempts);
+            return new LoginResponse
+            {
+                Success = false,
+                Error = $"Invalid email/username or password. ({remainingAttempts} attempt(s) remaining before account lockout)."
+            };
+        }
+
+        // Successful password verification: Reset failed attempts & unlock
+        user.FailedLoginAttempts = 0;
+        user.IsLockedOut = false;
+        user.LockoutEndUtc = null;
+        user.LockoutReason = null;
+
+        // Ensure security stamp exists
+        if (string.IsNullOrWhiteSpace(user.SecurityStamp))
+        {
+            user.SecurityStamp = Guid.NewGuid().ToString();
         }
 
         // Determine user role (defaults to TenantUser if no role assigned)
@@ -78,8 +157,11 @@ public class AuthenticationService : IAuthenticationService
         _userRepository.Update(user);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        // Generate JWT Token
+        // Generate 30-Minute JWT Token
         var token = _jwtTokenService.GenerateToken(user, primaryRole, primaryTenantId, allowedTenantIds);
+
+        // Generate 5-Day Refresh Token
+        var refreshToken = await _refreshTokenService.GenerateRefreshTokenAsync(user.Id, _currentUserService.IpAddress, cancellationToken);
 
         var currentUser = new CurrentUserDto
         {
@@ -111,6 +193,9 @@ public class AuthenticationService : IAuthenticationService
         {
             Success = true,
             Token = token,
+            RefreshToken = refreshToken.Token,
+            RefreshTokenExpiresUtc = refreshToken.ExpiresUtc,
+            MustChangePassword = user.MustChangePassword,
             User = currentUser
         };
     }

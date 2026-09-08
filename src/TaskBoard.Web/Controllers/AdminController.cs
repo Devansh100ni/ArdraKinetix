@@ -297,6 +297,54 @@ public class AdminController : Controller
         return RedirectToAction(nameof(Users));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UsersToggleLock(Guid id, [FromForm] string? reason, CancellationToken cancellationToken)
+    {
+        var result = await _userService.ToggleLockAsync(id, reason, cancellationToken);
+        if (!result.IsSuccess)
+        {
+            TempData["ErrorMessage"] = result.Error ?? "Failed to update user lock state.";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = "User account lock state updated successfully.";
+        }
+        return RedirectToAction(nameof(Users));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UsersForcePasswordReset(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _userService.ForcePasswordResetAsync(id, cancellationToken);
+        if (!result.IsSuccess)
+        {
+            TempData["ErrorMessage"] = result.Error ?? "Failed to set password reset requirement.";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = "User will be required to change password on their next login.";
+        }
+        return RedirectToAction(nameof(Users));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UsersRevokeSessions(Guid id, CancellationToken cancellationToken)
+    {
+        var result = await _userService.RevokeSessionsAsync(id, cancellationToken);
+        if (!result.IsSuccess)
+        {
+            TempData["ErrorMessage"] = result.Error ?? "Failed to revoke user sessions.";
+        }
+        else
+        {
+            TempData["SuccessMessage"] = "All user sessions have been revoked and the user was forced to logout.";
+        }
+        return RedirectToAction(nameof(Users));
+    }
+
     // ==========================================
     // STATUSES MANAGEMENT
     // ==========================================

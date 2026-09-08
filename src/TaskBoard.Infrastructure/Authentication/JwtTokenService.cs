@@ -19,10 +19,10 @@ public class JwtTokenService : IJwtTokenService
     public JwtTokenService(IConfiguration configuration)
     {
         _configuration = configuration;
-        _issuer = _configuration["Jwt:Issuer"] ?? "TaskBoardApp";
-        _audience = _configuration["Jwt:Audience"] ?? "TaskBoardClients";
+        _issuer = _configuration["Jwt:Issuer"] ?? "TaskBoardEnterpriseApp";
+        _audience = _configuration["Jwt:Audience"] ?? "TaskBoardEnterpriseClients";
         _secretKey = _configuration["Jwt:SecretKey"] ?? "TaskBoard_Super_Secret_Production_Key_2026_MinLength32Chars!";
-        _expirationMinutes = int.TryParse(_configuration["Jwt:ExpirationMinutes"], out var exp) ? exp : 60;
+        _expirationMinutes = int.TryParse(_configuration["Jwt:ExpirationMinutes"], out var exp) ? exp : 30;
     }
 
     public string GenerateToken(User user, string role, Guid? primaryTenantId, IReadOnlyList<Guid> allowedTenantIds)
@@ -36,7 +36,8 @@ public class JwtTokenService : IJwtTokenService
             new(ClaimTypes.Name, user.Username),
             new(ClaimTypes.Email, user.Email),
             new(ClaimTypes.Role, role),
-            new("FullName", user.FullName)
+            new("FullName", user.FullName),
+            new("SecurityStamp", user.SecurityStamp ?? string.Empty)
         };
 
         if (primaryTenantId.HasValue)
@@ -62,12 +63,14 @@ public class JwtTokenService : IJwtTokenService
         return tokenHandler.WriteToken(token);
     }
 
-    public bool ValidateToken(string token, out Guid userId, out string role, out Guid? tenantId, out IReadOnlyList<Guid> allowedTenantIds)
+    public bool ValidateToken(string token, out Guid userId, out string role, out Guid? tenantId, out IReadOnlyList<Guid> allowedTenantIds, out string? securityStamp, out DateTime? expiresUtc)
     {
         userId = Guid.Empty;
         role = string.Empty;
         tenantId = null;
         allowedTenantIds = [];
+        securityStamp = null;
+        expiresUtc = null;
 
         if (string.IsNullOrWhiteSpace(token))
         {
@@ -89,7 +92,12 @@ public class JwtTokenService : IJwtTokenService
                 ValidAudience = _audience,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.FromMinutes(1)
-            }, out _);
+            }, out var validatedToken);
+
+            if (validatedToken is JwtSecurityToken jwtToken)
+            {
+                expiresUtc = jwtToken.ValidTo;
+            }
 
             var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!Guid.TryParse(userIdClaim, out userId))
@@ -98,6 +106,7 @@ public class JwtTokenService : IJwtTokenService
             }
 
             role = principal.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty;
+            securityStamp = principal.FindFirst("SecurityStamp")?.Value;
 
             var tenantIdClaim = principal.FindFirst("TenantId")?.Value;
             if (Guid.TryParse(tenantIdClaim, out var tId))

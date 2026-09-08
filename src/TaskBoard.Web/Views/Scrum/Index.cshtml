@@ -94,7 +94,9 @@
     else
     {
         <!-- Scrum Columns Grid (Horizontal Scrollable) -->
-        <div id="scrum-board-container" class="flex-1 flex gap-5 overflow-x-auto pb-4 items-start select-none min-h-[550px]">
+        <div id="scrum-board-container" 
+             data-tenant-id="@(Model.SelectedTenantId?.ToString() ?? "")"
+             class="flex-1 flex gap-5 overflow-x-auto pb-4 items-start select-none min-h-[550px]">
             @foreach (var column in Model.Board.Columns.OrderBy(c => c.DisplayOrder))
             {
                 <div class="scrum-column w-80 shrink-0 bg-slate-100/90 border border-slate-200/90 rounded-2xl flex flex-col max-h-full shadow-sm"

@@ -9,6 +9,8 @@ using TaskBoard.Infrastructure.FileStorage;
 using TaskBoard.Infrastructure.Migrations;
 using TaskBoard.Infrastructure.Persistence;
 using TaskBoard.Infrastructure.Persistence.Repositories;
+using TaskBoard.Infrastructure.Realtime;
+using TaskBoard.Infrastructure.Services;
 using TaskBoard.Infrastructure.Tenancy;
 
 namespace TaskBoard.Infrastructure;
@@ -43,10 +45,16 @@ public static class DependencyInjection
         // Security & Tenancy Services
         services.AddScoped<IPasswordHasherService, PasswordHasherService>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+        services.AddScoped<IRealtimeNotificationService, RealtimeNotificationService>();
+        services.AddScoped<TaskBoard.Application.Features.Notifications.INotificationService, TaskBoard.Infrastructure.Services.NotificationService>();
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
         services.AddScoped<ITaskNumberGenerator, TaskNumberGenerator>();
         services.AddScoped<ITenantContext, TenantContext>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        // SignalR
+        services.AddSignalR();
 
         // Evolve Migrator
         services.AddTransient<DatabaseMigrator>();

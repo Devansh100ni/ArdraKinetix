@@ -13,8 +13,20 @@ public class LoginResponse
 {
     public bool Success { get; set; }
     public string? Token { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiresUtc { get; set; }
     public string? Error { get; set; }
+    public bool MustChangePassword { get; set; }
+    public bool IsLockedOut { get; set; }
+    public int? LockoutMinutesRemaining { get; set; }
     public CurrentUserDto? User { get; set; }
+}
+
+public class ChangePasswordDto
+{
+    public string CurrentPassword { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
+    public string ConfirmNewPassword { get; set; } = string.Empty;
 }
 
 public class CurrentUserDto

@@ -71,14 +71,17 @@ public class GlobalExceptionHandlingMiddleware
         {
             if (statusCode == HttpStatusCode.Forbidden || statusCode == HttpStatusCode.Unauthorized)
             {
-                context.Response.Redirect("/Account/AccessDenied");
+                var reqPath = context.Request.Path + context.Request.QueryString;
+                var encodedPath = Uri.EscapeDataString(reqPath);
+                context.Response.Redirect($"/Account/AccessDenied?requestedPath={encodedPath}");
             }
             else
             {
                 context.Items["ErrorMessage"] = message;
                 context.Items["StatusCode"] = (int)statusCode;
                 context.Items["CorrelationId"] = correlationId;
-                context.Response.Redirect($"/Home/Error?code={(int)statusCode}&correlationId={correlationId}");
+                var encodedCorrelation = Uri.EscapeDataString(correlationId);
+                context.Response.Redirect($"/Home/Error?code={(int)statusCode}&correlationId={encodedCorrelation}");
             }
         }
     }

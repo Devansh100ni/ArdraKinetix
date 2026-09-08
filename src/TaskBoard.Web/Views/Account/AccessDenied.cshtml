@@ -1,31 +1,105 @@
 @model AccessDeniedViewModel
 @{
-    ViewData["Title"] = "Access Denied";
+    Layout = null;
+    ViewData["Title"] = "Access Denied (403) - ArdraKinetix";
 }
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    
+    <partial name="_Favicons" />
+    
+    <script src="~/lib/tailwindcss/tailwind.min.js" asp-append-version="true"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                            950: '#082f49',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="min-h-screen bg-slate-50 flex flex-col justify-between font-sans antialiased text-slate-900 selection:bg-sky-500 selection:text-white">
 
-<div class="max-w-xl mx-auto mt-16 text-center">
-    <div class="w-20 h-20 rounded-3xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 mx-auto mb-6 shadow-sm">
-        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-    </div>
-
-    <h1 class="text-2xl font-black text-slate-900 mb-2">Access Denied (403)</h1>
-    <p class="text-slate-600 text-xs mb-6 leading-relaxed">
-        @(Model?.Message ?? "You do not have the required permissions or tenant access to view this resource.")
-    </p>
-
-    @if (!string.IsNullOrEmpty(Model?.RequestedPath))
-    {
-        <div class="p-2.5 bg-white border border-slate-200 rounded-xl font-mono text-xs text-slate-600 mb-6 inline-block shadow-2xs">
-            Target: @Model.RequestedPath
+    <!-- Header / Brand Bar -->
+    <header class="w-full px-6 py-4 border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="/" class="flex items-center">
+                <img src="~/images/ArdraKinetiX.png" alt="ArdraKinetix" class="h-10 sm:h-12 w-auto object-contain drop-shadow-xs" asp-append-version="true" />
+            </a>
+            <div class="flex items-center gap-3">
+                <a href="/Dashboard" class="px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition">
+                    Workspace &rarr;
+                </a>
+            </div>
         </div>
-    }
+    </header>
 
-    <div class="flex items-center justify-center gap-3">
-        <a href="/Dashboard" class="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition">
-            Back to Dashboard
-        </a>
-        <a href="/Tasks" class="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold shadow-2xs transition">
-            View My Tasks
-        </a>
-    </div>
-</div>
+    <!-- Access Denied Card -->
+    <main class="flex-1 flex items-center justify-center p-6">
+        <div class="max-w-lg w-full bg-white rounded-3xl border border-slate-200 shadow-2xl p-8 sm:p-10 text-center relative overflow-hidden">
+            
+            <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white shadow-lg shadow-amber-500/25 mx-auto mb-6">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+
+            <div class="mb-2">
+                <span class="px-3 py-1 rounded-full text-xs font-mono font-extrabold bg-amber-50 text-amber-800 border border-amber-200">
+                    HTTP 403 &bull; Forbidden
+                </span>
+            </div>
+
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-2 mb-3">
+                Access Restricted
+            </h1>
+
+            <p class="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed mb-6">
+                @(Model?.Message ?? "You do not have the required permissions or tenant scope to access this resource.")
+            </p>
+
+            @if (!string.IsNullOrEmpty(Model?.RequestedPath))
+            {
+                <div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-[11px] text-slate-500 mb-6 inline-block">
+                    <span>Target:</span> <span class="font-bold text-slate-700">@Model.RequestedPath</span>
+                </div>
+            }
+
+            <div class="flex flex-wrap items-center justify-center gap-3">
+                <a href="/Dashboard" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition transform active:scale-98">
+                    Return to Dashboard
+                </a>
+                <a href="/Tasks" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                    View My Tasks
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-[11px] text-slate-400 border-t border-slate-200/80 bg-white/60">
+        <span>ArdraKinetix Enterprise &bull; Powered by CodeArdra Solutions</span>
+    </footer>
+
+</body>
+</html>

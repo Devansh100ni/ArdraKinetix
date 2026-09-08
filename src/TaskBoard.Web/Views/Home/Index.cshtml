@@ -1,3 +1,4 @@
+@inject TaskBoard.Application.Security.ICurrentUserService CurrentUser
 @{
     Layout = null;
     ViewData["Title"] = "ArdraKinetix - Enterprise Multi-Tenant Scrum & Agile Platform";
@@ -9,6 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="ArdraKinetix is an enterprise-grade multi-tenant task board and agile Scrum execution engine Powered by CodeArdra Solutions." />
     <title>@ViewData["Title"]</title>
+    
+    <partial name="_Favicons" />
     
     <!-- Local Tailwind CSS -->
     <script src="~/lib/tailwindcss/tailwind.min.js" asp-append-version="true"></script>
@@ -130,10 +133,20 @@
 
             <!-- Action CTAs -->
             <div class="flex items-center gap-3">
-                <a href="/Account/Login" class="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-xs font-bold shadow-md shadow-sky-500/25 transition transform active:scale-98">
-                    <span>Sign In to Workspace</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </a>
+                @if (CurrentUser.IsAuthenticated)
+                {
+                    <a href="/Dashboard" class="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-xs font-bold shadow-md shadow-sky-500/25 transition transform active:scale-98">
+                        <span>Go to Workspaces</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                }
+                else
+                {
+                    <a href="/Account/Login" class="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-xs font-bold shadow-md shadow-sky-500/25 transition transform active:scale-98">
+                        <span>Sign In to Workspace</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                }
             </div>
 
         </div>
@@ -173,10 +186,20 @@
 
             <!-- Hero Action Buttons -->
             <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
-                <a href="/Account/Login" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-sm font-bold shadow-lg shadow-sky-500/25 transition transform hover:-translate-y-0.5 active:scale-98 flex items-center gap-2.5">
-                    <span>Enter Workspace Gateway</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                </a>
+                @if (CurrentUser.IsAuthenticated)
+                {
+                    <a href="/Dashboard" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-sm font-bold shadow-lg shadow-sky-500/25 transition transform hover:-translate-y-0.5 active:scale-98 flex items-center gap-2.5">
+                        <span>Go to Workspaces</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    </a>
+                }
+                else
+                {
+                    <a href="/Account/Login" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-sm font-bold shadow-lg shadow-sky-500/25 transition transform hover:-translate-y-0.5 active:scale-98 flex items-center gap-2.5">
+                        <span>Enter Workspace Gateway</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                    </a>
+                }
                 <a href="#demo-roles" class="px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-300/80 text-slate-800 text-sm font-bold shadow-xs hover:border-sky-400 transition transform hover:-translate-y-0.5 active:scale-98 flex items-center gap-2">
                     <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                     <span>1-Click Demo Accounts</span>

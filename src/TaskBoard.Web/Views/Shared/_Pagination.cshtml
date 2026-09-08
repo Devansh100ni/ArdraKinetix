@@ -1,6 +1,38 @@
 @using TaskBoard.Application.Common
 @model IPagedResult
 
+@functions {
+    string BuildPageUrl(int pageNumber, int pageSize)
+    {
+        var query = Context.Request.Query;
+        var queryParams = new List<string>();
+
+        foreach (var key in query.Keys)
+        {
+            if (string.Equals(key, "PageNumber", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(key, "PageSize", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var val = query[key].ToString();
+            if (!string.IsNullOrWhiteSpace(val))
+            {
+                queryParams.Add($"{Uri.EscapeDataString(key)}={Uri.EscapeDataString(val)}");
+            }
+        }
+
+        queryParams.Add($"PageNumber={pageNumber}");
+        if (pageSize != 10 && pageSize > 0)
+        {
+            queryParams.Add($"PageSize={pageSize}");
+        }
+
+        var path = Context.Request.Path;
+        return $"{path}?{string.Join("&", queryParams)}";
+    }
+}
+
 @if (Model != null && Model.TotalPages > 1)
 {
     <div class="flex items-center justify-between px-6 py-3.5 bg-slate-50 border-t border-slate-200 rounded-b-2xl text-xs">
@@ -13,7 +45,7 @@
         <div class="flex items-center gap-2">
             @if (Model.HasPreviousPage)
             {
-                <a href="@Url.Action(null, new { PageNumber = Model.PageNumber - 1, PageSize = Model.PageSize })"
+                <a href="@BuildPageUrl(Model.PageNumber - 1, Model.PageSize)"
                    class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-semibold shadow-2xs transition">
                     &larr; Previous
                 </a>
@@ -31,7 +63,7 @@
 
             @if (Model.HasNextPage)
             {
-                <a href="@Url.Action(null, new { PageNumber = Model.PageNumber + 1, PageSize = Model.PageSize })"
+                <a href="@BuildPageUrl(Model.PageNumber + 1, Model.PageSize)"
                    class="px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-semibold shadow-2xs transition">
                     Next &rarr;
                 </a>

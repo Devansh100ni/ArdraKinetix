@@ -165,7 +165,7 @@ public class TaskRepository : ITaskRepository
         return new PagedResult<TaskItem>(items, totalCount, criteria.PageNumber, criteria.PageSize);
     }
 
-    public async Task<IReadOnlyList<TaskItem>> GetBoardTasksAsync(Guid? tenantId, IReadOnlyList<Guid>? allowedTenantIds, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<TaskItem>> GetBoardTasksAsync(Guid? tenantId, IReadOnlyList<Guid>? allowedTenantIds, CancellationToken cancellationToken = default) 
     {
         var query = _context.Tasks
             .Include(t => t.Tenant)

@@ -16,6 +16,8 @@ public class UserService : IUserService
     private readonly ITenantRepository _tenantRepository;
     private readonly IPasswordHasherService _passwordHasher;
     private readonly IAdminAuditRepository _adminAuditRepository;
+    private readonly IRealtimeNotificationService _realtimeService;
+    private readonly IRefreshTokenService _refreshTokenService;
     private readonly ICurrentUserService _currentUserService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UserService> _logger;
@@ -25,6 +27,8 @@ public class UserService : IUserService
         ITenantRepository tenantRepository,
         IPasswordHasherService passwordHasher,
         IAdminAuditRepository adminAuditRepository,
+        IRealtimeNotificationService realtimeService,
+        IRefreshTokenService refreshTokenService,
         ICurrentUserService currentUserService,
         IUnitOfWork unitOfWork,
         ILogger<UserService> logger)
@@ -33,6 +37,8 @@ public class UserService : IUserService
         _tenantRepository = tenantRepository;
         _passwordHasher = passwordHasher;
         _adminAuditRepository = adminAuditRepository;
+        _realtimeService = realtimeService;
+        _refreshTokenService = refreshTokenService;
         _currentUserService = currentUserService;
         _unitOfWork = unitOfWork;
         _logger = logger;
@@ -234,6 +240,15 @@ public class UserService : IUserService
 
         user.IsActive = !user.IsActive;
         user.UpdatedOn = DateTime.UtcNow;
+
+        if (!user.IsActive)
+        {
+            // Revoke active sessions immediately
+            user.SecurityStamp = Guid.NewGuid().ToString();
+            await _refreshTokenService.RevokeAllUserTokensAsync(user.Id, _currentUserService.IpAddress, "User deactivated", cancellationToken);
+            await _realtimeService.SendForceLogoutAsync(user.Id, "Your account has been deactivated by an administrator.", cancellationToken);
+        }
+
         _userRepository.Update(user);
 
         await _adminAuditRepository.AddAsync(new AdminAudit
@@ -243,6 +258,163 @@ public class UserService : IUserService
             EntityType = "User",
             EntityId = user.Id.ToString(),
             Details = $"User '{user.Username}' status changed to Active={user.IsActive}",
+            IpAddress = _currentUserService.IpAddress
+        }, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return Result.Success();
+    }
+
+    public async Task<Result> ToggleLockAsync(Guid id, string? reason = null, CancellationToken cancellationToken = default)
+    {
+        var user = await _userRepository.GetByIdAsync(id, cancellationToken);
+        if (user == null)
+        {
+            return Result.Failure("User not found.");
+        }
+
+        if (user.IsLockedOut)
+        {
+            // Unlock user
+            user.IsLockedOut = false;
+            user.LockoutEndUtc = null;
+            user.FailedLoginAttempts = 0;
+            user.LockoutReason = null;
+            user.UpdatedOn = DateTime.UtcNow;
+            _userRepository.Update(user);
+
+            await _adminAuditRepository.AddAsync(new AdminAudit
+            {
+                UserId = _currentUserService.UserId,
+                Action = "UserUnlocked",
+                EntityType = "User",
+                EntityId = user.Id.ToString(),
+                Details = $"Unlocked account for user '{user.Username}'",
+                IpAddress = _currentUserService.IpAddress
+            }, cancellationToken);
+        }
+        else
+        {
+            // Manually lock user
+            user.IsLockedOut = true;
+            user.LockoutEndUtc = null; // Administrative lock does not expire automatically
+            user.LockoutReason = reason ?? "Manually locked by administrator";
+            user.SecurityStamp = Guid.NewGuid().ToString();
+            user.UpdatedOn = DateTime.UtcNow;
+            _userRepository.Update(user);
+
+            await _refreshTokenService.RevokeAllUserTokensAsync(user.Id, _currentUserService.IpAddress, "User locked by admin", cancellationToken);
+            await _realtimeService.SendForceLogoutAsync(user.Id, "Your account has been locked by an administrator.", cancellationToken);
+
+            await _adminAuditRepository.AddAsync(new AdminAudit
+            {
+                UserId = _currentUserService.UserId,
+                Action = "UserLocked",
+                EntityType = "User",
+                EntityId = user.Id.ToString(),
+                Details = $"Locked account for user '{user.Username}'. Reason: {user.LockoutReason}",
+                IpAddress = _currentUserService.IpAddress
+            }, cancellationToken);
+        }
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return Result.Success();
+    }
+
+    public async Task<Result> ForcePasswordResetAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var user = await _userRepository.GetByIdAsync(id, cancellationToken);
+        if (user == null)
+        {
+            return Result.Failure("User not found.");
+        }
+
+        user.MustChangePassword = true;
+        user.UpdatedOn = DateTime.UtcNow;
+        _userRepository.Update(user);
+
+        await _adminAuditRepository.AddAsync(new AdminAudit
+        {
+            UserId = _currentUserService.UserId,
+            Action = "UserForcePasswordReset",
+            EntityType = "User",
+            EntityId = user.Id.ToString(),
+            Details = $"Flagged user '{user.Username}' to change password upon next login",
+            IpAddress = _currentUserService.IpAddress
+        }, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return Result.Success();
+    }
+
+    public async Task<Result> RevokeSessionsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var user = await _userRepository.GetByIdAsync(id, cancellationToken);
+        if (user == null)
+        {
+            return Result.Failure("User not found.");
+        }
+
+        // Invalidate JWTs by changing security stamp
+        user.SecurityStamp = Guid.NewGuid().ToString();
+        user.UpdatedOn = DateTime.UtcNow;
+        _userRepository.Update(user);
+
+        // Revoke all refresh tokens
+        await _refreshTokenService.RevokeAllUserTokensAsync(user.Id, _currentUserService.IpAddress, "Revoke all sessions by admin", cancellationToken);
+
+        // Emit SignalR force logout event to active browsers
+        await _realtimeService.SendForceLogoutAsync(user.Id, "Your session has been terminated by an administrator.", cancellationToken);
+
+        await _adminAuditRepository.AddAsync(new AdminAudit
+        {
+            UserId = _currentUserService.UserId,
+            Action = "UserSessionsRevoked",
+            EntityType = "User",
+            EntityId = user.Id.ToString(),
+            Details = $"Revoked all active sessions and forced logout for user '{user.Username}'",
+            IpAddress = _currentUserService.IpAddress
+        }, cancellationToken);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        return Result.Success();
+    }
+
+    public async Task<Result> ChangePasswordAsync(Guid userId, string currentPassword, string newPassword, CancellationToken cancellationToken = default)
+    {
+        var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
+        if (user == null)
+        {
+            return Result.Failure("User not found.");
+        }
+
+        bool isCurrentValid = _passwordHasher.VerifyPassword(user, user.PasswordHash, currentPassword);
+        if (!isCurrentValid)
+        {
+            return Result.Failure("Current password is incorrect.");
+        }
+
+        if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+        {
+            return Result.Failure("New password must be at least 6 characters long.");
+        }
+
+        user.PasswordHash = _passwordHasher.HashPassword(user, newPassword);
+        user.MustChangePassword = false;
+        user.SecurityStamp = Guid.NewGuid().ToString();
+        user.UpdatedOn = DateTime.UtcNow;
+        _userRepository.Update(user);
+
+        // Revoke previous refresh tokens
+        await _refreshTokenService.RevokeAllUserTokensAsync(user.Id, _currentUserService.IpAddress, "Password changed", cancellationToken);
+
+        await _adminAuditRepository.AddAsync(new AdminAudit
+        {
+            UserId = _currentUserService.UserId,
+            Action = "PasswordChanged",
+            EntityType = "User",
+            EntityId = user.Id.ToString(),
+            Details = $"User '{user.Username}' changed their password successfully",
             IpAddress = _currentUserService.IpAddress
         }, cancellationToken);
 
@@ -297,6 +469,11 @@ public class UserService : IUserService
             Email = user.Email,
             Username = user.Username,
             IsActive = user.IsActive,
+            IsLockedOut = user.IsLockedOut,
+            LockoutEndUtc = user.LockoutEndUtc,
+            FailedLoginAttempts = user.FailedLoginAttempts,
+            LockoutReason = user.LockoutReason,
+            MustChangePassword = user.MustChangePassword,
             CreatedOn = user.CreatedOn,
             LastLoginOn = user.LastLoginOn,
             Roles = user.UserRoles?.Where(ur => ur.Role != null).Select(ur => ur.Role.Name).ToList() ?? [],

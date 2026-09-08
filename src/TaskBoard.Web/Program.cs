@@ -53,15 +53,46 @@ builder.Services.AddAuthentication(options =>
 
     options.Events = new JwtBearerEvents
     {
+        OnMessageReceived = context =>
+        {
+            // 1. SignalR Hub WebSockets & Long Polling send token in query string "access_token"
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+            {
+                context.Token = accessToken;
+                return Task.CompletedTask;
+            }
+
+            // 2. Extract Authorization header if present
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+            {
+                context.Token = authHeader.Substring("Bearer ".Length).Trim();
+                return Task.CompletedTask;
+            }
+
+            // 3. Fallback to auth cookie
+            if (context.Request.Cookies.TryGetValue(JwtAuthenticationMiddleware.CookieName, out var cookieToken))
+            {
+                context.Token = cookieToken;
+            }
+
+            return Task.CompletedTask;
+        },
         OnChallenge = context =>
         {
+            var isHub = context.Request.Path.StartsWithSegments("/hubs");
+            var isApi = context.Request.Path.StartsWithSegments("/api");
             var isAjax = string.Equals(context.Request.Headers["X-Requested-With"], "XMLHttpRequest", StringComparison.OrdinalIgnoreCase)
                          || (context.Request.Headers.Accept.Any(h => h != null && h.Contains("application/json")) && !context.Request.Headers.Accept.Any(h => h != null && h.Contains("text/html")));
 
-            if (!context.Request.Path.StartsWithSegments("/api") && !isAjax)
+            if (!isHub && !isApi && !isAjax)
             {
                 context.HandleResponse();
-                context.Response.Redirect($"/Account/Login?returnUrl={Uri.EscapeDataString(context.Request.Path + context.Request.QueryString)}");
+                var rawReturn = context.Request.Path + context.Request.QueryString;
+                var encodedReturn = Uri.EscapeDataString(rawReturn);
+                context.Response.Redirect($"/Account/Login?returnUrl={encodedReturn}");
             }
             return Task.CompletedTask;
         }
@@ -94,6 +125,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Status Code Error Page Re-execute (Catches 404 Not Found, 403 Forbidden, 500 etc.)
+app.UseStatusCodePagesWithReExecute("/Home/Error", "?code={0}");
+
 // Exception Handling Middleware
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
@@ -112,6 +146,8 @@ app.UseMiddleware<JwtAuthenticationMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<TaskBoard.Infrastructure.Realtime.TaskBoardHub>("/hubs/taskboard");
 
 app.MapControllerRoute(
     name: "default",

@@ -25,6 +25,8 @@ public class TaskBoardDbContext : DbContext
     public DbSet<AdminAudit> AdminAudits => Set<AdminAudit>();
     public DbSet<ScrumBoard> ScrumBoards => Set<ScrumBoard>();
     public DbSet<ScrumBoardColumn> ScrumBoardColumns => Set<ScrumBoardColumn>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

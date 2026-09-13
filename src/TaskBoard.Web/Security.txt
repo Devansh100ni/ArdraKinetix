@@ -1,0 +1,5 @@
+Full Name	      Username (User ID)	Email	                 Password	Role	        Organization / Scope
+System Administrator	admin	          admin@taskboard.local	     AdminPassword123!	Admin	        System-wide Global Admin
+Alex Developer	       devuser	         developer@taskboard.local	Developer123!	Developer	Multi-Tenant (Acme Corporation & Beta Dynamics)
+Sarah Acme	      acmeuser	           tenantuser@acme.local	TenantUser123!	TenantUser	Acme Corporation (ACM)
+David Beta	      betauser	           tenantuser@beta.local	TenantUser123!	TenantUser	Beta Dynamics (BET)

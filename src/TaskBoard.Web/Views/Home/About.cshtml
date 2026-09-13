@@ -1,0 +1,361 @@
+@inject TaskBoard.Application.Security.ICurrentUserService CurrentUser
+@{
+    Layout = null;
+    ViewData["Title"] = "About CodeArdra Solutions - Engineering the Future of Agile Task Management";
+}
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50 scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Learn about CodeArdra Solutions, the engineering team behind the ArdraKinetix Enterprise TaskBoard platform." />
+    <title>@ViewData["Title"]</title>
+    
+    <partial name="_Favicons" />
+    
+    <!-- Local Tailwind CSS -->
+    <script src="~/lib/tailwindcss/tailwind.min.js" asp-append-version="true"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                            950: '#082f49',
+                        }
+                    },
+                    boxShadow: {
+                        'glow-brand': '0 0 50px -5px rgba(2, 132, 199, 0.25)',
+                        'glow-emerald': '0 0 50px -5px rgba(16, 185, 129, 0.2)',
+                        'glow-card': '0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 0 35px -5px rgba(2, 132, 199, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        .grid-background {
+            background-size: 36px 36px;
+            background-image: 
+                linear-gradient(to right, rgba(2, 132, 199, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(2, 132, 199, 0.08) 1px, transparent 1px);
+            mask-image: radial-gradient(ellipse 80% 65% at 50% 30%, #000 40%, transparent 95%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 65% at 50% 30%, #000 40%, transparent 95%);
+        }
+
+        .ambient-mesh {
+            background: radial-gradient(circle at 15% 20%, rgba(2, 132, 199, 0.14) 0%, transparent 45%),
+                        radial-gradient(circle at 85% 20%, rgba(6, 182, 212, 0.16) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 60%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 85%, rgba(56, 189, 248, 0.10) 0%, transparent 45%);
+        }
+
+        .glass-panel-elevated {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+        }
+
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased selection:bg-sky-500 selection:text-white relative overflow-x-hidden flex flex-col justify-between">
+
+    <!-- Ambient Mesh & Grid Background Canvas -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute inset-0 ambient-mesh"></div>
+        <div class="absolute inset-0 grid-background"></div>
+        <div id="orb-1" class="absolute -top-32 -left-32 w-[38rem] h-[38rem] bg-sky-300/40 rounded-full blur-[110px] pointer-events-none"></div>
+        <div id="orb-2" class="absolute top-1/3 -right-32 w-[36rem] h-[36rem] bg-cyan-300/40 rounded-full blur-[120px] pointer-events-none"></div>
+        <div id="orb-3" class="absolute bottom-10 left-1/4 w-[40rem] h-[40rem] bg-emerald-200/40 rounded-full blur-[130px] pointer-events-none"></div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 w-full px-6 py-4 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="/" class="flex items-center">
+                    <img src="~/images/ArdraKinetiX.png" alt="ArdraKinetix" class="h-12 sm:h-14 w-auto max-w-[220px] object-contain drop-shadow-xs" asp-append-version="true" />
+                </a>
+                <span class="hidden lg:inline-block h-5 w-px bg-slate-200"></span>
+                <span class="hidden lg:inline-block text-xs font-semibold text-slate-500">By CodeArdra Solutions</span>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-8 text-xs font-bold text-slate-600">
+                <a href="/" class="hover:text-sky-600 transition">Home</a>
+                <a href="/Products" class="hover:text-sky-600 transition">Products</a>
+                <a href="/About" class="text-sky-600 font-extrabold border-b-2 border-sky-600 pb-0.5">About Us</a>
+                <a href="/#features" class="hover:text-sky-600 transition">Features</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                @if (CurrentUser.IsAuthenticated)
+                {
+                    <a href="/Dashboard" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-xs font-bold shadow-md shadow-sky-500/25 transition transform active:scale-98">
+                        <span>Workspace</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                }
+                else
+                {
+                    <a href="/Account/Login" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-xs font-bold shadow-md shadow-sky-500/25 transition transform active:scale-98">
+                        <span>Sign In</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                }
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="relative z-10 flex-1">
+        
+        <!-- Hero Section -->
+        <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-slate-200 shadow-2xs text-xs font-semibold text-slate-700 mb-6 backdrop-blur-sm">
+                <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+                <span class="font-bold text-slate-900">CodeArdra Solutions</span>
+                <span class="text-slate-300">&bull;</span>
+                <span class="text-sky-600 font-bold">Engineering Excellence</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight max-w-4xl mx-auto">
+                Pioneering deterministic, resilient 
+                <span class="bg-gradient-to-r from-sky-600 via-blue-600 to-teal-500 bg-clip-text text-transparent">task & agile software.</span>
+            </h1>
+
+            <p class="mt-6 text-base sm:text-lg text-slate-600 font-medium leading-relaxed max-w-3xl mx-auto">
+                CodeArdra Solutions was founded with a singular purpose: to rid modern software teams of sprint fragmentation, chaotic multi-tenant overhead, and unreliable tracking. We build software engineered for speed, mathematical isolation, and high-velocity execution.
+            </p>
+        </section>
+
+        <!-- Company Mission & Architectural Pedigree -->
+        <section class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                
+                <!-- Left: The CodeArdra Story -->
+                <div class="glass-panel-elevated p-8 sm:p-10 rounded-3xl shadow-sm flex flex-col justify-between">
+                    <div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">Our Vision</span>
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mt-4 tracking-tight">
+                            Built by Developers, Engineered for Mission-Critical Delivery.
+                        </h2>
+                        <div class="mt-5 space-y-4 text-sm text-slate-600 leading-relaxed font-medium">
+                            <p>
+                                At CodeArdra Solutions, we believe that task boards should never be glorified to-do lists. High-performing engineering departments demand strict multi-tenant isolation, verifiable audit trails, dynamic WIP limits, and lightning-fast sub-millisecond status mutations.
+                            </p>
+                            <p>
+                                This philosophy led to the creation of <span class="font-bold text-slate-900">ArdraKinetix Enterprise</span>, our flagship Agile Scrum platform. Designed from day one on Clean Architecture and domain-driven design, it delivers deterministic row-level tenant fencing alongside frictionless developer workflows.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-slate-100 flex items-center gap-6">
+                        <div>
+                            <div class="text-2xl font-black text-sky-600">100%</div>
+                            <div class="text-xs text-slate-500 font-semibold">Tenant Data Isolation</div>
+                        </div>
+                        <div class="h-8 w-px bg-slate-200"></div>
+                        <div>
+                            <div class="text-2xl font-black text-emerald-600">&lt; 10ms</div>
+                            <div class="text-xs text-slate-500 font-semibold">Average Query Latency</div>
+                        </div>
+                        <div class="h-8 w-px bg-slate-200"></div>
+                        <div>
+                            <div class="text-2xl font-black text-cyan-600">Zero</div>
+                            <div class="text-xs text-slate-500 font-semibold">Cross-Tenant Leakage</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Our Core Engineering Principles -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    
+                    <!-- Pillar 1 -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md transition">
+                        <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold text-sm mb-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900">Tenant Invariant Boundaries</h3>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed font-medium">
+                            Every repository query, mutation, and signal broadcast strictly filters on validated tenant contexts.
+                        </p>
+                    </div>
+
+                    <!-- Pillar 2 -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md transition">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm mb-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900">Cryptographic Integrity</h3>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed font-medium">
+                            PBKDF2 HMAC-SHA512 hashing with individual salt iteration prevents rainbow attacks and guarantees token safety.
+                        </p>
+                    </div>
+
+                    <!-- Pillar 3 -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md transition">
+                        <div class="w-10 h-10 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold text-sm mb-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900">Agile Flow Optimization</h3>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed font-medium">
+                            Interactive Scrum workflows with configurable WIP limits ensure teams avoid multitasking bottlenecks.
+                        </p>
+                    </div>
+
+                    <!-- Pillar 4 -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md transition">
+                        <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-sm mb-3">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900">Clean Architecture</h3>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed font-medium">
+                            Clear decoupling between Domain, Application CQRS, Dapper Infrastructure, and ASP.NET Core Presentation.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- The Tech Stack Section -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-200/80">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-sky-600">Under the Hood</h2>
+                <p class="text-3xl font-black text-slate-900 mt-2 tracking-tight">
+                    Engineered with Enterprise-Grade Technology.
+                </p>
+                <p class="text-xs text-slate-500 mt-2 font-medium">
+                    Every layer of ArdraKinetix is constructed using industry-proven, high-performance tooling.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 text-center">
+                <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                    <div class="font-mono text-sm font-black text-sky-600">.NET 10</div>
+                    <div class="text-[11px] text-slate-500 mt-1 font-semibold">C# 14 Runtime</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                    <div class="font-mono text-sm font-black text-emerald-600">SQL Server</div>
+                    <div class="text-[11px] text-slate-500 mt-1 font-semibold">Partitioned Engine</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                    <div class="font-mono text-sm font-black text-cyan-600">Dapper + EF</div>
+                    <div class="text-[11px] text-slate-500 mt-1 font-semibold">High-Speed ORM</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                    <div class="font-mono text-sm font-black text-blue-600">Tailwind CSS</div>
+                    <div class="text-[11px] text-slate-500 mt-1 font-semibold">Utility Design</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                    <div class="font-mono text-sm font-black text-teal-600">Alpine.js</div>
+                    <div class="text-[11px] text-slate-500 mt-1 font-semibold">Reactive Micro-UI</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                    <div class="font-mono text-sm font-black text-purple-600">Evolve</div>
+                    <div class="text-[11px] text-slate-500 mt-1 font-semibold">Versioned Migrations</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact / Enterprise Inquiry Section -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-slate-200/80" x-data="{ submitted: false }">
+            <div class="glass-panel-elevated p-8 sm:p-10 rounded-3xl shadow-glow-card">
+                <div class="text-center mb-8">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">Get in Touch</span>
+                    <h2 class="text-2xl sm:text-3xl font-black text-slate-900 mt-3 tracking-tight">Connect with CodeArdra Solutions</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-2 font-medium">
+                        Looking to implement ArdraKinetix Enterprise for your engineering organization or inquire about custom architectural integration? We are here to assist.
+                    </p>
+                </div>
+
+                <div x-show="submitted" x-cloak class="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-center">
+                    <div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    </div>
+                    <h3 class="text-base font-bold text-emerald-900">Thank you for contacting CodeArdra Solutions!</h3>
+                    <p class="text-xs text-emerald-700 mt-1">Our enterprise solutions architects will review your message and reply promptly.</p>
+                </div>
+
+                <form x-show="!submitted" @@submit.prevent="submitted = true" class="space-y-4 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1 text-[11px]">Full Name</label>
+                            <input type="text" required placeholder="e.g. Jane Doe" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition shadow-2xs" />
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1 text-[11px]">Business Email</label>
+                            <input type="email" required placeholder="jane@company.com" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition shadow-2xs" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1 text-[11px]">Organization / Tenant Name</label>
+                            <input type="text" placeholder="e.g. Acme Corp" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition shadow-2xs" />
+                        </div>
+                        <div>
+                            <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1 text-[11px]">Inquiry Type</label>
+                            <select class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition shadow-2xs">
+                                <option>Enterprise Multi-Tenant Deployment</option>
+                                <option>Architecture & Integration Consulting</option>
+                                <option>Custom Scrum Workflow Request</option>
+                                <option>General Inquiries</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1 text-[11px]">Your Message</label>
+                        <textarea rows="4" required placeholder="Describe your team's task management and sprint workflow requirements..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition shadow-2xs"></textarea>
+                    </div>
+
+                    <div class="pt-2 text-center">
+                        <button type="submit" class="px-8 py-3 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold text-xs shadow-md shadow-sky-500/25 transition transform active:scale-98">
+                            Send Inquiry to CodeArdra
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-20 border-t border-slate-200/80 bg-white/80 backdrop-blur-md py-8 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <div class="flex items-center gap-3">
+                <img src="~/images/ArdraKinetiX.png" alt="ArdraKinetix" class="h-8 w-auto object-contain opacity-80" asp-append-version="true" />
+                <span>&copy; @DateTime.UtcNow.Year ArdraKinetix Enterprise. All rights reserved.</span>
+            </div>
+            
+            <div class="flex items-center gap-5 font-semibold text-xs">
+                <span class="text-sky-600 font-bold">Powered by CodeArdra Solutions</span>
+                <span class="text-slate-300">&bull;</span>
+                <a href="/" class="hover:text-sky-600 transition">Home</a>
+                <span class="text-slate-300">&bull;</span>
+                <a href="/Products" class="hover:text-sky-600 transition">Products</a>
+                <span class="text-slate-300">&bull;</span>
+                <a href="/Account/Login" class="hover:text-sky-600 transition">Workspace Sign In</a>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="~/lib/alpinejs/cdn.min.js" asp-append-version="true"></script>
+</body>
+</html>

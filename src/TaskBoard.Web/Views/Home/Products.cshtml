@@ -1,0 +1,399 @@
+@inject TaskBoard.Application.Security.ICurrentUserService CurrentUser
+@{
+    Layout = null;
+    ViewData["Title"] = "ArdraKinetix Enterprise - Agile TaskBoard by CodeArdra Solutions";
+}
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50 scroll-smooth">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Discover ArdraKinetix Enterprise TaskBoard, the flagship multi-tenant agile scrum platform developed by CodeArdra Solutions." />
+    <title>@ViewData["Title"]</title>
+    
+    <partial name="_Favicons" />
+    
+    <!-- Local Tailwind CSS -->
+    <script src="~/lib/tailwindcss/tailwind.min.js" asp-append-version="true"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                            950: '#082f49',
+                        }
+                    },
+                    boxShadow: {
+                        'glow-brand': '0 0 50px -5px rgba(2, 132, 199, 0.25)',
+                        'glow-emerald': '0 0 50px -5px rgba(16, 185, 129, 0.2)',
+                        'glow-card': '0 20px 40px -15px rgba(15, 23, 42, 0.08), 0 0 35px -5px rgba(2, 132, 199, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        .grid-background {
+            background-size: 36px 36px;
+            background-image: 
+                linear-gradient(to right, rgba(2, 132, 199, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(2, 132, 199, 0.08) 1px, transparent 1px);
+            mask-image: radial-gradient(ellipse 80% 65% at 50% 30%, #000 40%, transparent 95%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 65% at 50% 30%, #000 40%, transparent 95%);
+        }
+
+        .ambient-mesh {
+            background: radial-gradient(circle at 15% 20%, rgba(2, 132, 199, 0.14) 0%, transparent 45%),
+                        radial-gradient(circle at 85% 20%, rgba(6, 182, 212, 0.16) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 60%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 85%, rgba(56, 189, 248, 0.10) 0%, transparent 45%);
+        }
+
+        .glass-panel-elevated {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+        }
+
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased selection:bg-sky-500 selection:text-white relative overflow-x-hidden flex flex-col justify-between">
+
+    <!-- Ambient Mesh & Grid Background Canvas -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute inset-0 ambient-mesh"></div>
+        <div class="absolute inset-0 grid-background"></div>
+        <div id="orb-1" class="absolute -top-32 -left-32 w-[38rem] h-[38rem] bg-sky-300/40 rounded-full blur-[110px] pointer-events-none"></div>
+        <div id="orb-2" class="absolute top-1/3 -right-32 w-[36rem] h-[36rem] bg-cyan-300/40 rounded-full blur-[120px] pointer-events-none"></div>
+        <div id="orb-3" class="absolute bottom-10 left-1/4 w-[40rem] h-[40rem] bg-emerald-200/40 rounded-full blur-[130px] pointer-events-none"></div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 w-full px-6 py-4 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="/" class="flex items-center">
+                    <img src="~/images/ArdraKinetiX.png" alt="ArdraKinetix" class="h-12 sm:h-14 w-auto max-w-[220px] object-contain drop-shadow-xs" asp-append-version="true" />
+                </a>
+                <span class="hidden lg:inline-block h-5 w-px bg-slate-200"></span>
+                <span class="hidden lg:inline-block text-xs font-semibold text-slate-500">By CodeArdra Solutions</span>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-8 text-xs font-bold text-slate-600">
+                <a href="/" class="hover:text-sky-600 transition">Home</a>
+                <a href="/Products" class="text-sky-600 font-extrabold border-b-2 border-sky-600 pb-0.5">Products</a>
+                <a href="/About" class="hover:text-sky-600 transition">About Us</a>
+                <a href="/#features" class="hover:text-sky-600 transition">Features</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                @if (CurrentUser.IsAuthenticated)
+                {
+                    <a href="/Dashboard" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-xs font-bold shadow-md shadow-sky-500/25 transition transform active:scale-98">
+                        <span>Workspace</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                }
+                else
+                {
+                    <a href="/Account/Login" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-xs font-bold shadow-md shadow-sky-500/25 transition transform active:scale-98">
+                        <span>Sign In</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                }
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="relative z-10 flex-1">
+        
+        <!-- Hero Section -->
+        <section class="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-slate-200 shadow-2xs text-xs font-semibold text-slate-700 mb-6 backdrop-blur-sm">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="font-bold text-slate-900">ArdraKinetix Enterprise Platform</span>
+                <span class="text-slate-300">&bull;</span>
+                <span class="text-sky-600 font-bold">Flagship Product</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight max-w-4xl mx-auto">
+                Next-generation multi-tenant 
+                <span class="bg-gradient-to-r from-sky-600 via-blue-600 to-teal-500 bg-clip-text text-transparent">Agile Scrum management.</span>
+            </h1>
+
+            <p class="mt-6 text-base sm:text-lg text-slate-600 font-medium leading-relaxed max-w-3xl mx-auto">
+                Engineered by CodeArdra Solutions to deliver sprint velocity with deterministic row-level tenant orchestration, interactive HTML5 drag-and-drop boards, subtask trees, and immutable audit trails.
+            </p>
+
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+                <a href="/Account/Login" class="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white text-sm font-bold shadow-lg shadow-sky-500/25 transition transform hover:-translate-y-0.5 active:scale-98 flex items-center gap-2.5">
+                    <span>Enter Workspace Gateway</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+                <a href="/About" class="px-7 py-3.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-300/80 text-slate-800 text-sm font-bold shadow-xs hover:border-sky-400 transition transform hover:-translate-y-0.5 active:scale-98 flex items-center gap-2">
+                    <span>Inquire with CodeArdra</span>
+                </a>
+            </div>
+        </section>
+
+        <!-- Core Architectural Modules Grid -->
+        <section class="py-14 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-sky-600">Product Capabilities</h2>
+                <p class="text-3xl font-black text-slate-900 mt-2 tracking-tight">
+                    Four Deeply Engineered Core Modules.
+                </p>
+                <p class="text-xs text-slate-500 mt-2 font-medium">
+                    ArdraKinetix unites multi-tenant enterprise security with fluid everyday Scrum delivery.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Module 1 -->
+                <div class="glass-panel-elevated p-8 rounded-3xl shadow-sm hover:shadow-md transition duration-200">
+                    <div class="w-12 h-12 rounded-2xl bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center mb-5">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600">Module 01</span>
+                    <h3 class="text-xl font-extrabold text-slate-900 mt-1">Multi-Tenant Organization Gateways</h3>
+                    <p class="text-xs text-slate-600 mt-2.5 leading-relaxed font-medium">
+                        Complete cryptographic and row-level separation. Each tenant maintains its own independent sequence generator (e.g. <span class="font-mono text-sky-600 font-bold">ACM-000001</span>), board settings, and member roles, while developers seamlessly toggle across assigned organizations without context leakage.
+                    </p>
+                    <ul class="mt-4 space-y-2 text-xs text-slate-700 font-semibold">
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                            <span>Dedicated Tenant Sequence Counters</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                            <span>Cross-Tenant Developer Switcher Bar</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>
+                            <span>Automatic Multi-Tenancy Scoped JWT Claims</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Module 2 -->
+                <div class="glass-panel-elevated p-8 rounded-3xl shadow-sm hover:shadow-md transition duration-200">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center mb-5">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Module 02</span>
+                    <h3 class="text-xl font-extrabold text-slate-900 mt-1">Interactive HTML5 Scrum Engine</h3>
+                    <p class="text-xs text-slate-600 mt-2.5 leading-relaxed font-medium">
+                        Fluid drag-and-drop state transitions with instant server-side mutation. Supports dynamic status columns, custom order indexing, and active Work-In-Progress (WIP) limit threshold indicators to prevent sprint bottlenecks.
+                    </p>
+                    <ul class="mt-4 space-y-2 text-xs text-slate-700 font-semibold">
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span>Dynamic Drag-and-Drop Column Transitions</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span>Automated WIP Limits & Overcapacity Alerts</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span>Custom Board Columns Configuration</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Module 3 -->
+                <div class="glass-panel-elevated p-8 rounded-3xl shadow-sm hover:shadow-md transition duration-200">
+                    <div class="w-12 h-12 rounded-2xl bg-cyan-50 border border-cyan-100 text-cyan-600 flex items-center justify-center mb-5">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-600">Module 03</span>
+                    <h3 class="text-xl font-extrabold text-slate-900 mt-1">Hierarchical Tasks & Subtasks Tree</h3>
+                    <p class="text-xs text-slate-600 mt-2.5 leading-relaxed font-medium">
+                        Break complex user stories into granular executable subtasks. View parent-child completion percentages, story point / estimated hour totals, secure file attachment handling, and threaded team discussions.
+                    </p>
+                    <ul class="mt-4 space-y-2 text-xs text-slate-700 font-semibold">
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                            <span>Parent User Story to Subtask Hierarchy</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                            <span>Estimated vs Actual Hours Tracking</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                            <span>Attachment Previews & Safe GUID Storage</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Module 4 -->
+                <div class="glass-panel-elevated p-8 rounded-3xl shadow-sm hover:shadow-md transition duration-200">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center mb-5">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-teal-600">Module 04</span>
+                    <h3 class="text-xl font-extrabold text-slate-900 mt-1">Enterprise Audit Trails & Security</h3>
+                    <p class="text-xs text-slate-600 mt-2.5 leading-relaxed font-medium">
+                        Every single movement on the board is recorded in an immutable audit timeline. Combined with PBKDF2 HMAC-SHA512 password protection, JWT cookie security, and role-based permissions, your team meets strict compliance demands.
+                    </p>
+                    <ul class="mt-4 space-y-2 text-xs text-slate-700 font-semibold">
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                            <span>Immutable Audit Event Timeline & Diff Tracking</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                            <span>PBKDF2 HMAC-SHA512 Salted Cryptography</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>
+                            <span>Global Admin Oversight vs Scoped Tenant Roles</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Deployment Editions & Tier Comparison -->
+        <section class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-200/80">
+            <div class="text-center max-w-2xl mx-auto mb-12">
+                <h2 class="text-xs font-bold uppercase tracking-widest text-sky-600">Deployment Options</h2>
+                <p class="text-3xl font-black text-slate-900 mt-2 tracking-tight">
+                    Flexible Editions Engineered for Scale.
+                </p>
+                <p class="text-xs text-slate-500 mt-2 font-medium">
+                    Deploy ArdraKinetix Enterprise either as a managed multi-tenant workspace or an on-premises dedicated instance.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                
+                <!-- Cloud Edition -->
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">Standard Cloud</span>
+                            <span class="text-xs text-slate-400 font-bold font-mono">Shared Cluster</span>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900 mt-3">Multi-Tenant Cloud Workspace</h3>
+                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                            Perfect for fast-moving startups and agile product engineering teams that want instant setup with automated backups and maintenance.
+                        </p>
+                        
+                        <div class="mt-6 space-y-3 text-xs text-slate-700">
+                            <div class="flex items-center gap-2 font-semibold">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Isolated Tenant Partition & Custom Prefix</span>
+                            </div>
+                            <div class="flex items-center gap-2 font-semibold">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Interactive Drag-and-Drop Scrum Board</span>
+                            </div>
+                            <div class="flex items-center gap-2 font-semibold">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Unlimited Subtask Tree Hierarchies</span>
+                            </div>
+                            <div class="flex items-center gap-2 font-semibold">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Automated Evolve Migrations</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-slate-100">
+                        <a href="/Account/Login" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition">
+                            <span>Sign In to Cloud Workspace</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Dedicated Enterprise Edition -->
+                <div class="bg-gradient-to-b from-white to-sky-50/40 p-8 rounded-3xl border-2 border-sky-500 shadow-lg shadow-sky-500/10 flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-4 right-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-600 text-white">
+                        Recommended
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">Enterprise Dedicated</span>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900 mt-3">Dedicated Enterprise Cluster</h3>
+                        <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+                            For organizations demanding dedicated database clusters, custom compliance SLA, on-premises private cloud deployment, and priority engineering support.
+                        </p>
+                        
+                        <div class="mt-6 space-y-3 text-xs text-slate-700">
+                            <div class="flex items-center gap-2 font-semibold">
+                                <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Dedicated SQL Server / LocalDB Instance</span>
+                            </div>
+                            <div class="flex items-center gap-2 font-semibold">
+                                <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Custom Organization Board Customizations</span>
+                            </div>
+                            <div class="flex items-center gap-2 font-semibold">
+                                <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Dedicated Telemetry & Full Audit Retention</span>
+                            </div>
+                            <div class="flex items-center gap-2 font-semibold">
+                                <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span>Direct CodeArdra Solutions Engineering SLA</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-slate-200">
+                        <a href="/About" class="w-full py-3 rounded-xl bg-gradient-to-r from-sky-600 via-blue-600 to-cyan-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md shadow-sky-500/25 transition transform active:scale-98">
+                            <span>Request Enterprise Setup</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-20 border-t border-slate-200/80 bg-white/80 backdrop-blur-md py-8 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <div class="flex items-center gap-3">
+                <img src="~/images/ArdraKinetiX.png" alt="ArdraKinetix" class="h-8 w-auto object-contain opacity-80" asp-append-version="true" />
+                <span>&copy; @DateTime.UtcNow.Year ArdraKinetix Enterprise. All rights reserved.</span>
+            </div>
+            
+            <div class="flex items-center gap-5 font-semibold text-xs">
+                <span class="text-sky-600 font-bold">Powered by CodeArdra Solutions</span>
+                <span class="text-slate-300">&bull;</span>
+                <a href="/" class="hover:text-sky-600 transition">Home</a>
+                <span class="text-slate-300">&bull;</span>
+                <a href="/About" class="hover:text-sky-600 transition">About Us</a>
+                <span class="text-slate-300">&bull;</span>
+                <a href="/Account/Login" class="hover:text-sky-600 transition">Workspace Sign In</a>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="~/lib/alpinejs/cdn.min.js" asp-append-version="true"></script>
+</body>
+</html>

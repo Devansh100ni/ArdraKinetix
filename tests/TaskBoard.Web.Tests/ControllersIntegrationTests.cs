@@ -138,4 +138,25 @@ public class ControllersIntegrationTests : IClassFixture<WebApplicationFactory<P
         var adminRes = await client.GetAsync("/Admin/Tenants");
         adminRes.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
+
+    [Fact]
+    public async Task PublicPages_AboutAndProducts_RenderSuccessfully()
+    {
+        var client = _factory.CreateClient();
+
+        // 1. About Page
+        var aboutRes = await client.GetAsync("/About");
+        aboutRes.StatusCode.Should().Be(HttpStatusCode.OK);
+        var aboutHtml = await aboutRes.Content.ReadAsStringAsync();
+        aboutHtml.Should().Contain("CodeArdra Solutions");
+        aboutHtml.Should().Contain("Under the Hood");
+
+        // 2. Products Page
+        var productsRes = await client.GetAsync("/Products");
+        productsRes.StatusCode.Should().Be(HttpStatusCode.OK);
+        var productsHtml = await productsRes.Content.ReadAsStringAsync();
+        productsHtml.Should().Contain("ArdraKinetix Enterprise");
+        productsHtml.Should().Contain("Multi-Tenant Organization Gateways");
+    }
 }
+

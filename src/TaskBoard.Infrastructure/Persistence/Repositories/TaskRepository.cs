@@ -56,18 +56,18 @@ public class TaskRepository : ITaskRepository
 
     public async Task<PagedResult<TaskItem>> GetPagedAsync(TaskFilterCriteria criteria, CancellationToken cancellationToken = default)
     {
-        var query = _context.Tasks
-            .Include(t => t.Tenant)
-            .Include(t => t.AssignedUser)
-            .Include(t => t.Creator)
-            .Include(t => t.Status)
-            .Include(t => t.Priority)
-            .Include(t => t.ParentTask)
-            .Include(t => t.Comments.Where(c => !c.IsDeleted))
-            .Include(t => t.Attachments.Where(a => !a.IsDeleted))
-            .Include(t => t.ChildTasks.Where(c => !c.IsDeleted))
-            .AsNoTracking()
-            .Where(t => !t.IsDeleted);
+        IQueryable<TaskItem> query = _context.Tasks
+                                             .Include(t => t.Tenant)
+                                             .Include(t => t.AssignedUser)
+                                             .Include(t => t.Creator)
+                                             .Include(t => t.Status)
+                                             .Include(t => t.Priority)
+                                             .Include(t => t.ParentTask)
+                                             .Include(t => t.Comments.Where(c => !c.IsDeleted))
+                                             .Include(t => t.Attachments.Where(a => !a.IsDeleted))
+                                             .Include(t => t.ChildTasks.Where(c => !c.IsDeleted))
+                                             .AsNoTracking()
+                                             .Where(t => !t.IsDeleted);
 
         // Tenant Scoping
         if (criteria.TenantId.HasValue)
@@ -138,9 +138,9 @@ public class TaskRepository : ITaskRepository
         if (!string.IsNullOrWhiteSpace(criteria.Search))
         {
             var search = criteria.Search.Trim().ToLower();
-            query = query.Where(t => t.Title.ToLower().Contains(search) 
-                                  || t.TaskNumber.ToLower().Contains(search) 
-                                  || (t.Description != null && t.Description.ToLower().Contains(search)));
+            query = query.Where(t => t.Title.Contains(search, StringComparison.CurrentCultureIgnoreCase)
+                                  || t.TaskNumber.Contains(search, StringComparison.CurrentCultureIgnoreCase)
+                                  || (t.Description != null && t.Description.Contains(search, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         // Sorting
@@ -156,18 +156,17 @@ public class TaskRepository : ITaskRepository
             _ => criteria.SortDescending ? query.OrderByDescending(t => t.CreatedOn) : query.OrderBy(t => t.CreatedOn)
         };
 
-        var totalCount = await query.CountAsync(cancellationToken);
-        var items = await query
-            .Skip((criteria.PageNumber - 1) * criteria.PageSize)
-            .Take(criteria.PageSize)
-            .ToListAsync(cancellationToken);
+        int totalCount = await query.CountAsync(cancellationToken);
+        List<TaskItem> items = await query.Skip((criteria.PageNumber - 1) * criteria.PageSize)
+                                          .Take(criteria.PageSize)
+                                          .ToListAsync(cancellationToken);
 
         return new PagedResult<TaskItem>(items, totalCount, criteria.PageNumber, criteria.PageSize);
     }
 
     public async Task<IReadOnlyList<TaskItem>> GetBoardTasksAsync(Guid? tenantId, IReadOnlyList<Guid>? allowedTenantIds, CancellationToken cancellationToken = default) 
     {
-        var query = _context.Tasks
+        IQueryable<TaskItem> query = _context.Tasks
             .Include(t => t.Tenant)
             .Include(t => t.AssignedUser)
             .Include(t => t.Creator)
@@ -215,8 +214,8 @@ public class TaskRepository : ITaskRepository
         }
 
         // Traverse upwards from prospectiveParentId to see if taskId is reached
-        var currentParentId = (Guid?)prospectiveParentId;
-        var visited = new HashSet<Guid>();
+        Guid? currentParentId = (Guid?)prospectiveParentId;
+        HashSet<Guid> visited = [];
 
         while (currentParentId.HasValue)
         {

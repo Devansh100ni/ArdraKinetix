@@ -82,31 +82,3 @@ function initCard3DTilt() {
     });
 }
 
-/**
- * 1-Click Demo Credential Populator with animated button feedback and form highlights.
- * @param {string} identifier - The username or email to fill.
- * @param {string} password - The password to fill.
- * @param {string} btnId - The button element ID clicked.
- */
-function fillCredentials(identifier, password, btnId) {
-    const idInput = document.getElementById('Identifier');
-    const passInput = document.getElementById('Password');
-    const button = document.getElementById(btnId);
-
-    if (button && typeof gsap !== 'undefined') {
-        gsap.fromTo(button,
-            { scale: 0.92 },
-            { scale: 1, duration: 0.3, ease: 'back.out(2)' }
-        );
-    }
-
-    if (idInput) idInput.value = identifier;
-    if (passInput) passInput.value = password;
-
-    // Flash highlight on the active input fields
-    [idInput, passInput].forEach(el => {
-        if (!el) return;
-        el.classList.add('bg-sky-50/70', 'border-sky-400');
-        setTimeout(() => el.classList.remove('bg-sky-50/70', 'border-sky-400'), 500);
-    });
-}

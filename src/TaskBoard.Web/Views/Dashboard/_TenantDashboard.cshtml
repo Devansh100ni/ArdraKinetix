@@ -13,9 +13,57 @@
     </div>
 
     <div class="flex items-center gap-3">
+        <a href="/Scrum" class="px-4 py-2 rounded-xl bg-white border border-slate-200 hover:border-sky-300 text-slate-700 text-xs font-bold shadow-xs transition">
+            Scrum Board &rarr;
+        </a>
         <a href="/Tasks/Create" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md shadow-sky-500/20 transition">
             + New Task
         </a>
+    </div>
+</div>
+
+@{
+    var completionPercent = Model.TotalTasks > 0 ? (int)Math.Round((double)Model.CompletedTasks / Model.TotalTasks * 100) : 0;
+}
+
+<!-- Sprint Delivery Health & Velocity Progress Banner -->
+<div class="bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 text-white p-6 sm:p-7 rounded-3xl shadow-xl border border-slate-800 relative overflow-hidden">
+    <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sky-300 text-xs font-bold mb-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Sprint Health & Velocity</span>
+            </div>
+            <h3 class="text-xl sm:text-2xl font-black tracking-tight text-white">
+                @completionPercent% Story Completion
+            </h3>
+            <p class="text-xs text-slate-300 mt-1 font-medium">
+                @Model.CompletedTasks of @Model.TotalTasks tasks delivered across active board sprints.
+            </p>
+        </div>
+
+        <div class="flex items-center gap-3 shrink-0">
+            <a href="/Scrum" class="px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-bold text-xs shadow-md shadow-sky-500/30 transition flex items-center gap-2">
+                <span>Interactive Scrum Board</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </a>
+            <a href="/Tasks/Create" class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs transition border border-white/20">
+                + Create Task
+            </a>
+        </div>
+    </div>
+
+    <!-- Progress Track -->
+    <div class="mt-6 relative z-10">
+        <div class="w-full h-3.5 bg-white/10 rounded-full overflow-hidden p-0.5">
+            <div class="h-full bg-gradient-to-r from-sky-400 via-cyan-400 to-emerald-400 rounded-full transition-all duration-500" style="width: @(Math.Max(completionPercent, 3))%;"></div>
+        </div>
+        <div class="flex items-center justify-between text-[11px] font-semibold text-slate-300 mt-2 font-mono">
+            <span>In-Flight Work: @Model.OpenTasks</span>
+            <span>Overdue Items: @Model.OverdueTasksCount</span>
+            <span>Completed: @Model.CompletedTasks</span>
+        </div>
     </div>
 </div>
 

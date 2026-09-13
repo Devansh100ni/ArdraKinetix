@@ -18,6 +18,18 @@ public class HomeController : Controller
         return View();
     }
 
+    [HttpGet("About")]
+    public IActionResult About()
+    {
+        return View();
+    }
+
+    [HttpGet("Products")]
+    public IActionResult Products()
+    {
+        return View();
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error(int? code = null, string? correlationId = null)
     {

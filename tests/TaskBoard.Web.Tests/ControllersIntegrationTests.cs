@@ -148,7 +148,7 @@ public class ControllersIntegrationTests : IClassFixture<WebApplicationFactory<P
         var aboutRes = await client.GetAsync("/About");
         aboutRes.StatusCode.Should().Be(HttpStatusCode.OK);
         var aboutHtml = await aboutRes.Content.ReadAsStringAsync();
-        aboutHtml.Should().Contain("CodeArdra Solutions");
+        aboutHtml.Should().Contain("ArdraKinetix");
         aboutHtml.Should().Contain("Under the Hood");
 
         // 2. Products Page
